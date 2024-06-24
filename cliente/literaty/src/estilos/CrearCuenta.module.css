@@ -1,0 +1,236 @@
+.body-crear-cuenta {
+  background-image: url(../assets/crearCuentaImg.svg);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
+}
+
+.contenedor-crear-cuenta {
+  display: flex;
+  height: 100vh;
+}
+
+div.inicio-sesion,
+div.crear-cuenta {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 80px;
+}
+
+div.avatar {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+div.avatar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #f4e5e0;
+}
+
+div.avatar-imagen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  display: none;
+}
+
+button.doble {
+  display: block;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+span.material-icons-outlined.icono-ojo,
+span.material-icons-outlined.icono-ojo-cerrado {
+  color: #f4e5e0;
+}
+
+div.inicio-sesion {
+  text-align: center;
+}
+
+div.crear-cuenta button {
+  margin-left: 30px;
+  margin-top: 50px;
+}
+
+div.avatar {
+  margin-left: 30%;
+}
+
+.material-symbols-outlined.flecha {
+  transform: rotateY(180deg) rotateX(-180deg) translateZ(256px);
+  -webkit-transform: rotateY(180deg) rotateX(-180deg) translateZ(256px);
+}
+
+div.botones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-imagen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  display: none;
+  clip-path: circle(50%);
+}
+
+div.avatar {
+  min-height: 100px;
+}
+
+.form {
+  padding-left: 40px;
+}
+
+.h2-titulo-CC {
+  font-size: clamp(0.7rem, 8vw, 4rem);
+  transition: font-size 0.3s;
+  color: #252627;
+  margin-bottom: 5%;
+}
+
+.alert {
+  padding: 20px;
+  width: 100px;
+  background-color: #252627;
+  color: #f4e5e0;
+  border-radius: 5px;
+  margin-left: 50px;
+}
+
+.oculto {
+  display: none;
+}
+
+@media only screen and (min-width: 676px) and (max-width: 1024px) {
+  .body-crear-cuenta {
+    background-image: url(../assets/crearCuentaImgDer.svg);
+  }
+
+  .boton-reverso.doble {
+    border-radius: 20px;
+    background-color: #252627;
+    color: #f4e5e0;
+    transition: transform 0.3s;
+    margin-bottom: 20px;
+  }
+
+  .boton.doble {
+    border-radius: 20px;
+    background-color: #f4e5e0;
+    color: #252627;
+    transition: transform 0.3s;
+    margin-bottom: 20px;
+  }
+
+  div.crear-cuenta button {
+    margin-left: 10px;
+    color: #f4e5e0;
+    background-color: #252627;
+  }
+
+  div.inicio-sesion h2 {
+    color: #f4e5e0;
+  }
+
+  input.form {
+    background-color: transparent;
+    border: none;
+    padding: 0.5rem 1rem;
+    outline: none;
+    font-family: "Nunito", sans-serif;
+    font-size: 1em;
+    color: #252627;
+  }
+
+  input.form::placeholder {
+    color: #252627;
+  }
+
+  input.form:focus {
+    box-shadow: none;
+  }
+
+  span.material-icons-outlined.icono-ojo,
+  span.material-icons-outlined.icono-ojo-cerrado {
+    color: #f4e5e0;
+  }
+
+  .h2-titulo-CC {
+    font-size: clamp(0.7rem, 8vw, 2.5rem);
+  }
+}
+
+@media only screen and (min-width: 320px) and (max-width: 675px) {
+  body {
+    background-image: none;
+  }
+
+  .body-crear-cuenta {
+    background-image: none;
+  }
+  div.crear-cuenta {
+    background-image: url(../assets/crearCuentaImgMovil.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding-bottom: 250px;
+    padding-top: 50px;
+  }
+
+  div.avatar {
+    margin-left: 40px;
+  }
+
+  div.inicio-sesion,
+  div.crear-cuenta {
+    height: auto;
+    margin-bottom: 50px;
+    justify-content: flex-start;
+  }
+
+  .contenedor-crear-cuenta {
+    flex-direction: column;
+    height: auto;
+  }
+
+  div.inicio-sesion {
+    margin-top: -120px;
+    line-height: 50px;
+  }
+
+  div.crear-cuenta button {
+    margin: 30px;
+  }
+
+  div.avatar {
+    margin-bottom: 20px;
+  }
+}

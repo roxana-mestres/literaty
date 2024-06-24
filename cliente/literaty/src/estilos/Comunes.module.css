@@ -1,0 +1,127 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  font-size: 1.3em;
+  background-color: #f4e5e0;
+}
+
+h1.titulo,
+.h1-titulo {
+  font-family: "Martel", serif;
+  font-size: clamp(4rem, 8vw, 8rem);
+  transition: font-size 0.3s;
+  color: #252627;
+}
+
+h2.titulo,
+h3.titulo,
+.h2-titulo,
+.h3-titulo {
+  font-size: clamp(0.7rem, 8vw, 2rem);
+  transition: font-size 0.3s;
+  color: #252627;
+}
+
+input {
+  background-color: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+  outline: none;
+  font-family: "Nunito", sans-serif;
+  font-size: 1em;
+  color: #f4e5e0;
+}
+
+input::placeholder {
+  color: #f4e5e0;
+}
+
+input:focus {
+  box-shadow: none;
+}
+
+.barra-negra {
+  background-color: #252627;
+  height: 70px;
+  width: 100%;
+}
+
+button {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  font-size: 1.2em;
+  padding: 0.5rem 1rem;
+}
+
+.boton {
+  border-radius: 20px;
+  background-color: #252627;
+  color: #f4e5e0;
+  transition: transform 0.3s;
+  margin-bottom: 20px;
+}
+
+.boton:hover {
+  transform: translateY(2px);
+}
+
+.boton:active {
+  transform: translateY(4px);
+}
+
+.boton-reverso {
+  border-radius: 20px;
+  background-color: #f4e5e0;
+  color: #252627;
+  transition: transform 0.3s;
+  margin-bottom: 20px;
+}
+
+.boton-reverso:hover {
+  transform: translateY(2px);
+}
+
+.boton-reverso:active {
+  transform: translateY(4px);
+}
+
+.botones-contenedor {
+  display: flex;
+  gap: 1rem;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.material-icons-outlined {
+  font-family: "Material Icons Outlined";
+  font-size: 1.2em;
+  vertical-align: middle;
+  margin-left: 5px;
+  cursor: pointer;
+  color: #f4e5e0;
+}
+@media screen and (max-width: 767px) {
+  .h1-titulo {
+    font-size: clamp(3rem, 6vw, 6rem);
+  }
+  .h3-titulo {
+    font-size: clamp(0.5rem, 5vw, 1.5rem);
+    text-align: center;
+  }
+  .botones-contenedor-inicio {
+    flex-direction: column;
+    align-items: center;
+  }
+}
