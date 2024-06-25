@@ -49,7 +49,7 @@ const ComponenteCrearCuenta = () => {
       body: JSON.stringify(usuario),
     });
     const data = await respuesta.json();
-    if (data.success) {
+    if (respuesta.ok && data.message === "Usuario creado exitosamente") {
       setExito(true);
       setError("");
       console.log('Cuenta creada con éxito. Redirigiendo a la página de inicio de sesión...');
@@ -57,7 +57,7 @@ const ComponenteCrearCuenta = () => {
     } else {
       setExito(false);
       setError(data.error);
-      console.error(`Error al crear la cuenta: ${data}`);
+      console.error(`Error al crear la cuenta: ${JSON.stringify(data)}`);
     }
   };
 
