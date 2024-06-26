@@ -111,12 +111,12 @@ div.avatar {
   padding-left: 60px;
 }
 
-input[name="nombre"]{
+input[name="nombre"] {
   padding-top: 50px;
 }
 
 .h2-titulo-CC {
-  font-size: clamp(0.7rem, 8vw, 4rem);
+  font-size: clamp(0.2rem, 8vw, 4rem);
   transition: font-size 0.3s;
   color: #252627;
   margin-bottom: 5%;
@@ -149,12 +149,15 @@ input[name="nombre"]{
     margin-bottom: 20px;
   }
 
-  .boton.doble {
+  div.botones button {
+    width: 180px;
     border-radius: 20px;
     background-color: #f4e5e0;
     color: #252627;
     transition: transform 0.3s;
     margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 1em;
   }
 
   div.crear-cuenta button {
@@ -164,6 +167,8 @@ input[name="nombre"]{
 
   div.inicio-sesion h2 {
     color: #f4e5e0;
+    line-height: 70px;
+    font-size: 1.8em;
   }
 
   input.form {
@@ -242,7 +247,7 @@ input[name="nombre"]{
     margin: 0 auto;
   }
 
-  .h2-titulo-CC{
+  .h2-titulo-CC {
     line-height: 50px;
     padding-top: 20px;
   }

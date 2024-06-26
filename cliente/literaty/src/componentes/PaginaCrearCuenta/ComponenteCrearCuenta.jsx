@@ -14,6 +14,11 @@ const ComponenteCrearCuenta = () => {
   const [exito, setExito] = useState(false);
   const [error, setError] = useState("");
   const [indiceAvatar, setIndiceAvatar] = useState(0);
+  const [contrasenaVisible, setContrasenaVisible] = useState(false);
+  const [repetirContrasenaVisible, setRepetirContrasenaVisible] =
+    useState(false);
+  const [mostrarRequisitos, setMostrarRequisitos] = useState(false);
+  const imagenesAvatar = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6];
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
@@ -28,21 +33,74 @@ const ComponenteCrearCuenta = () => {
 
   const cambiarAvatar = () => {
     setIndiceAvatar((prevIndice) => (prevIndice + 1) % imagenesAvatar.length);
+    console.log("Avatar actual", indiceAvatar);
   };
-
-  const imagenesAvatar = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6];
 
   const handleCambiosInput = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  const toggleVisibilidadContrasena = () => {
+    setContrasenaVisible((prevVisible) => !prevVisible);
+  };
+
+  const toggleVisibilidadRepetirContrasena = () => {
+    setRepetirContrasenaVisible((prevVisible) => !prevVisible);
+  };
+
+  const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
+
+  const validarContrasena = (password) => {
+    return regexContrasena.test(password);
+  };
+
+  
+
+  const validarCorreo = (email) => {
+    return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,3}$/.test(email);
+  };
+
   const guardarUsuario = async (e) => {
     e.preventDefault();
+
+    if (typeof formData.avatar !== "number") {
+      console.error("El avatar no es un número válido")
+      return;
+    }
+
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(formData.nombre)) {
+      alert("El nombre solo debe contener letras.");
+      return;
+    }
+
+    // Validar correo electrónico
+    if (!validarCorreo(formData.email)) {
+      alert("Correo electrónico no válido.");
+      return;
+    }
+
+    // Validar que las contraseñas coincidan
+    if (formData.password !== formData.repetirPassword) {
+      alert("Las contraseñas no coinciden.");
+      return;
+    }
+
+    // Validar contraseña
+    if (!validarContrasena(formData.password)) {
+      alert(
+        "La contraseña debe incluir al menos 8 caracteres, 1 número y 1 símbolo."
+      );
+      return;
+    }
+
     const usuario = {
       ...formData,
       avatar: indiceAvatar,
     };
+
+    console.log("Datos del usuario a enviar:", usuario);
+
     const respuesta = await fetch("http://localhost:3000/api/crear-cuenta", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -52,7 +110,9 @@ const ComponenteCrearCuenta = () => {
     if (respuesta.ok && data.message === "Usuario creado exitosamente") {
       setExito(true);
       setError("");
-      console.log('Cuenta creada con éxito. Redirigiendo a la página de inicio de sesión...');
+      console.log(
+        "Cuenta creada con éxito. Redirigiendo a la página de inicio de sesión..."
+      );
       navegar("/iniciar-sesion");
     } else {
       setExito(false);
@@ -118,7 +178,7 @@ const ComponenteCrearCuenta = () => {
             </div>
             <div className={estiloCrearCuenta["campo"]}>
               <input
-                type="password"
+                type={contrasenaVisible ? "text" : "password"}
                 className={estiloCrearCuenta["form"]}
                 placeholder="Contraseña_"
                 name="password"
@@ -130,7 +190,10 @@ const ComponenteCrearCuenta = () => {
               <span
                 className={`${estilos["material-icons-outlined"]} ${estilos["icono-ojo"]} ${estilos["icono-ojo-cerrado"]}`}
                 style={{ fontSize: "1em" }}
-              ></span>
+                onClick={toggleVisibilidadContrasena}
+              >
+                {contrasenaVisible ? "visibility_off" : "visibility"}
+              </span>
               <div
                 className={estiloCrearCuenta["mensaje-error"]}
                 style={{ display: "none", marginLeft: "30px" }}
@@ -138,7 +201,7 @@ const ComponenteCrearCuenta = () => {
             </div>
             <div className={estiloCrearCuenta["campo"]}>
               <input
-                type="password"
+                type={repetirContrasenaVisible ? "text" : "password"}
                 className={estiloCrearCuenta["form"]}
                 placeholder="Repetir contraseña_"
                 name="repetirPassword"
@@ -147,6 +210,13 @@ const ComponenteCrearCuenta = () => {
                 required
                 autoComplete="new-password"
               />
+              <span
+                className={`${estilos["material-icons-outlined"]} ${estilos["icono-ojo"]} ${estilos["icono-ojo-cerrado"]}`}
+                style={{ fontSize: "1em" }}
+                onClick={toggleVisibilidadRepetirContrasena}
+              >
+                {repetirContrasenaVisible ? "visibility_off" : "visibility"}
+              </span>
               <div
                 className={estiloCrearCuenta["mensaje-error"]}
                 style={{ display: "none" }}
@@ -165,12 +235,6 @@ const ComponenteCrearCuenta = () => {
             ¿Ya tienes cuenta? <br /> Inicia sesión
           </h2>
           <div className={estiloCrearCuenta["botones"]}>
-            <button
-              className={`${estilos["boton"]} ${estilos["doble"]}`}
-              style={{ backgroundColor: "#B20808" }}
-            >
-              <a>Google</a>
-            </button>
             <button className={`${estilos["boton"]} ${estilos["doble"]}`}>
               <a href="/iniciar-sesion">Iniciar sesión</a>
             </button>

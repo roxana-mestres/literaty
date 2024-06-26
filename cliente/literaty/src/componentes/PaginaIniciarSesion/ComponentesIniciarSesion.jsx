@@ -9,6 +9,7 @@ function ComponenteIniciarSesion() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [exito, setExito] = useState(false);
+  const [contrasenaVisible, setContrasenaVisible] = useState(false);
 
   const handleInicioSesion = async (e) => {
     e.preventDefault();
@@ -43,17 +44,23 @@ function ComponenteIniciarSesion() {
     }
   };
 
+  const toggleVisibilidadContrasena = () => {
+    setContrasenaVisible((prevVisible) => !prevVisible);
+  };
+
   return (
     <>
       <div className={estilosIniciarSesion["body-iniciar-sesion"]}>
         <div className={estilosIniciarSesion["contenedor-iniciar-sesion"]}>
           <div className={estilosIniciarSesion["barra-negra"]}></div>
-          <span
-            className={`${estilos["material-icons-outlined"]}`}
-            style={{ color: "#252627", fontSize: "52px" }}
-          >
-            arrow_back
-          </span>
+          <Link to="/crear-cuenta">
+            <span
+              className={`${estilos["material-icons-outlined"]}`}
+              style={{ color: "#252627", fontSize: "52px" }}
+            >
+              arrow_back
+            </span>
+          </Link>
           <div className={estilosIniciarSesion["contenido-iniciar-sesion"]}>
             <h2 className={estilos["h2-titulo"]}>Literaty_</h2>
             <div className={estilosIniciarSesion["contenedor-inicio-sesion"]}>
@@ -77,6 +84,7 @@ function ComponenteIniciarSesion() {
                     className={`${estilosIniciarSesion["contenedor-contrasena"]} ${estilosIniciarSesion["campo-contrasena"]}`}
                   >
                     <input
+                      type={contrasenaVisible ? "text" : "password"}
                       className={estilosIniciarSesion["campo-input"]}
                       placeholder="Contraseña_"
                       name="password"
@@ -87,7 +95,10 @@ function ComponenteIniciarSesion() {
                     <span
                       className={`${estilos["material-icons-outlined"]} ${estilos["icono-ojo"]} ${estilos["icono-ojo-cerrado"]}`}
                       style={{ fontSize: "1em" }}
-                    ></span>
+                      onClick={toggleVisibilidadContrasena}
+                    >
+                      {contrasenaVisible ? "visibility_off" : "visibility"}
+                    </span>
                   </div>
                   <div
                     className={estilosIniciarSesion["mensaje-error"]}
