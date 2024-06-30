@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const authRutas = require("./rutas/authRutas");
+const usuarioRutas = require("./rutas/usuarioRutas");
 const cors = require("cors");
 
 // Configuración variables de entorno desde .env
@@ -29,8 +30,9 @@ mongoose
   .then(() => console.log("Conexión a MongoDB establecida"))
   .catch((error) => console.log("Error al conectar a MongDB: ", error));
 
-// Usar rutas definidas en authRutas
+// Rutas
 app.use("/api", authRutas);
+app.use('/api', usuarioRutas);
 
 // Ruta principal para servir el archivo index.html
 app.get("/", (peticion, respuesta) => {
