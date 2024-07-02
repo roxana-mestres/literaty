@@ -23,7 +23,7 @@ const buscarLibros = async (peticion, respuesta) => {
 
 const obtenerLibros = async (peticion, respuesta) => {
   const emailUsuario = peticion.body.email;
-  console.log("emailUsuario desde petición:", emailUsuario);
+  console.log("emailUsuario desde petición - obtenerLibros:", emailUsuario);
 
   try {
     const usuarioId = await obtenerIdDelUsuarioPorEmail(emailUsuario);
@@ -55,10 +55,13 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     let librosFiltrados = [];
     let intentos = 0;
-    const librosUsados = new Set();
+    const idsVistos = new Set();
+
+    const librosEliminados =
+      librosEliminadosPorUsuario.get(usuarioId) || new Set();
 
     while (librosFiltrados.length < cantidadDeseada && intentos < maxIntentos) {
-      const indiceInicio = Math.floor(Math.random() * 1000);
+      const indiceInicio = Math.floor(Math.random() * 500);
       intentos++;
 
       try {
@@ -70,15 +73,17 @@ const obtenerLibros = async (peticion, respuesta) => {
         const nuevosLibros = (data.items || []).filter((libro) => {
           const volumenInfo = libro.volumeInfo || {};
           const categorias = volumenInfo.categories || [];
+          const libroId = libro.id || "";
           return (
+            !librosEliminados.has(libroId) &&
             categorias.length > 0 &&
             categorias[0] !== "Unknown" &&
             volumenInfo.averageRating &&
-            !librosUsados.has(libro.id)
+            !idsVistos.has(libroId)
           );
         });
 
-        nuevosLibros.forEach((libro) => librosUsados.add(libro.id));
+        nuevosLibros.forEach((libro) => idsVistos.add(libro.id));
         librosFiltrados = librosFiltrados.concat(nuevosLibros);
 
         if (librosFiltrados.length > cantidadDeseada) {
@@ -98,4 +103,28 @@ const obtenerLibros = async (peticion, respuesta) => {
   }
 };
 
-module.exports = { buscarLibros, obtenerLibros };
+const librosEliminadosPorUsuario = new Map();
+
+const eliminarLibro = async (peticion, respuesta) => {
+  const { email } = peticion.body;
+  const libroId = peticion.params.id;
+
+  if (!email || !libroId) {
+    return respuesta.status(400).json({ message: 'Faltan parámetros' });
+  }
+
+  const usuarioId = await obtenerIdDelUsuarioPorEmail(email);
+  if (!usuarioId) {
+    return respuesta.status(404).json({ message: 'Usuario no encontrado' });
+  }
+
+  if (!librosEliminadosPorUsuario.has(usuarioId)) {
+    librosEliminadosPorUsuario.set(usuarioId, new Set());
+  }
+
+  librosEliminadosPorUsuario.get(usuarioId).add(libroId);
+
+  respuesta.status(204).send();
+};
+
+module.exports = { buscarLibros, obtenerLibros, eliminarLibro };

@@ -1,29 +1,35 @@
-import ItemLibro from "./ComponenteItemLibro";
-import principal from "../../estilos/PaginaPrincipal.module.css";
 import PropTypes from "prop-types";
+import ComponenteItemLibro from "./ComponenteItemLibro";
+import principal from "../../estilos/PaginaPrincipal.module.css";
 
-function SeccionLibros({ librosGoogleBooks }) {
+function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro }) {
   const librosConImagen = librosGoogleBooks.filter((libro) => {
-    const volumeInfo = libro.volumeInfo;
+    const volumeInfo = libro.volumeInfo || {};
     return volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail;
   });
 
   return (
-    <div className={`${principal["seccion-libros-grid"]}`}>
+    <div className={principal["seccion-libros-grid"]}>
       {librosConImagen.map((libro, index) => {
-        const volumeInfo = libro.volumeInfo;
+        const volumeInfo = libro.volumeInfo || {};
         return (
-          <div key={index} className={principal["item-libro"]}>
-            <ItemLibro
+          <div key={`${libro.id}`} className={`${principal["item-libro"]}`}>
+            <ComponenteItemLibro
               libro={{
+                id: libro.id,
                 title: volumeInfo.title,
                 authors: volumeInfo.authors || [],
-                mainCategory: volumeInfo.categories ? volumeInfo.categories[0] : "Unknown",
+                mainCategory: volumeInfo.categories
+                  ? volumeInfo.categories[0]
+                  : "Unknown",
                 averageRating: volumeInfo.averageRating,
                 description: volumeInfo.description,
-                image: volumeInfo.imageLinks ? volumeInfo.imageLinks.thumbnail : ""
+                image: volumeInfo.imageLinks
+                  ? volumeInfo.imageLinks.thumbnail
+                  : "",
               }}
               mostrarDiv={true}
+              onEliminar={onEliminarLibro}
             />
           </div>
         );
@@ -32,9 +38,10 @@ function SeccionLibros({ librosGoogleBooks }) {
   );
 }
 
-SeccionLibros.propTypes = {
+ComponenteSeccionLibros.propTypes = {
   librosGoogleBooks: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.string.isRequired,
       volumeInfo: PropTypes.shape({
         title: PropTypes.string,
         authors: PropTypes.arrayOf(PropTypes.string),
@@ -47,6 +54,7 @@ SeccionLibros.propTypes = {
       }),
     })
   ).isRequired,
+  onEliminarLibro: PropTypes.func.isRequired,
 };
 
-export default SeccionLibros;
+export default ComponenteSeccionLibros;

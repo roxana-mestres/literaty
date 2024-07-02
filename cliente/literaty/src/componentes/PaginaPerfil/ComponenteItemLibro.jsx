@@ -1,9 +1,8 @@
 import principal from "../../estilos/PaginaPrincipal.module.css";
 import PropTypes from "prop-types";
 
-function ItemLibro(props) {
-  const { libro } = props;
-  console.log(props)
+function ComponenteItemLibro({ libro, onEliminar, ...props }) {
+
 
   const estiloTextoTitulo = {
     color: props.colorTextoTitulo,
@@ -31,6 +30,12 @@ function ItemLibro(props) {
     titulo.length > 25 ? titulo.slice(0, 25) + "..." : titulo;
   const autoresCortados =
     autores.length > 25 ? autores.slice(0, 25) + "..." : autores;
+
+  const handleEliminar = () => {
+    if (onEliminar) {
+      onEliminar(libro.id);
+    }
+  };
 
   return (
     <div className={`${principal["div-libro-notas"]} ${props.className}`}>
@@ -73,6 +78,7 @@ function ItemLibro(props) {
           <span
             className="material-symbols-outlined"
             style={{ estiloIcono, cursor: "pointer" }}
+            onClick={handleEliminar}
           >
             delete
           </span>
@@ -82,7 +88,7 @@ function ItemLibro(props) {
   );
 }
 
-ItemLibro.propTypes = {
+ComponenteItemLibro.propTypes = {
   className: PropTypes.string,
   mostrarDiv: PropTypes.bool,
   colorTextoTitulo: PropTypes.string,
@@ -90,12 +96,14 @@ ItemLibro.propTypes = {
   colorFondo: PropTypes.string,
   colorIcono: PropTypes.string,
   libro: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     title: PropTypes.string,
     authors: PropTypes.arrayOf(PropTypes.string),
     mainCategory: PropTypes.string,
     averageRating: PropTypes.number,
     image: PropTypes.string,
-  }),
+  }).isRequired,
+  onEliminar: PropTypes.func.isRequired,
 };
 
-export default ItemLibro;
+export default ComponenteItemLibro;
