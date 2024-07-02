@@ -1,0 +1,94 @@
+div.div-general {
+  width: 100%;
+  height: 100vh;
+}
+.div-iconos-mas {
+  width: 80vw;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.h1-listas {
+  display: flex;
+  margin-top: 50px;
+  margin-left: 50px;
+}
+.titulo {
+  margin-top: 20px;
+  margin-left: 50px;
+  margin-bottom: 50px;
+  color: #252627;
+}
+.circulo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid #252627;
+  color: #252627;
+  font-size: 50px;
+  font-weight: 100;
+  margin-top: 20px;
+  margin-left: 50px;
+}
+.parrafos {
+  color: #252627;
+}
+.mas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.circulo-contenedor {
+  min-height: 170px;
+  margin-right: 50px;
+}
+.iconos-lista {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.iconos-lista img {
+  max-width: 80px;
+}
+.titulo-lista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+  max-width: 120px;
+  min-height: 150px;
+}
+
+a {
+  margin-top: 20px;
+}
+
+.titulo-lista p {
+  white-space: normal;
+  word-break: break-word;
+  margin-left: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+/*SECCIÓN LIBROS*/
+
+.titulo-seccion-libros {
+  color: #f4e5e0;
+  text-align: center;
+  padding-top: 100px;
+}
+.seccion-libros {
+  background-image: url(../assets/fondo-listas.svg);
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: cover;
+  margin-bottom: -100px;
+}

@@ -1,0 +1,78 @@
+.div-flecha-itemlibro {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: 20px;
+  margin-top: 50px;
+}
+
+.itemlibro {
+  margin-left: 50px;
+}
+
+.textoresena {
+  width: calc(100% - 20%);
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 4% 10% 10% 10%;
+}
+
+.textoresena p {
+  line-height: 30px;
+  text-align: justify;
+}
+/*POPUP*/
+.popup {
+  max-width: 30%;
+  padding: 20px;
+  border-radius: 5px;
+  border: 2px solid #252627;
+  background-color: #f4e5e0;
+  overflow: auto;
+  position: fixed;
+  bottom: 60px;
+  left: 100px;
+  z-index: 1;
+}
+
+.popup-derecha {
+  max-width: 30%;
+  padding: 20px;
+  border-radius: 5px;
+  border: 2px solid #252627;
+  background-color: #f4e5e0;
+  overflow: auto;
+  position: fixed;
+  bottom: 60px;
+  right: 100px;
+  z-index: 1;
+}
+.popup-derecha ul {
+  list-style: none;
+  font-size: 18px;
+}
+
+.popup-item:hover {
+  background-color: #ddd0cc;
+  cursor: pointer;
+}
+
+.popup-fondo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+@media screen and (max-width: 767px) {
+  .itemlibro {
+    margin-left: 10px;
+  }
+  .textoresena {
+    margin-top: 40px;
+  }
+}

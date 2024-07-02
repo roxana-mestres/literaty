@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import estilosIniciarSesion from "../../estilos/IniciarSesion.module.css";
 import estilos from "../../estilos/Comunes.module.css";
@@ -25,12 +25,12 @@ function ComponenteIniciarSesion() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(usuario),
+          credentials: "include",
         }
       );
 
       const data = await respuesta.json();
       if (data.message === "Inicio de sesión exitoso") {
-        console.log("Se ha iniciado sesión correctamente");
         setError("");
         setExito(true);
         navegar("/perfil");

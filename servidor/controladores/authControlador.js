@@ -84,6 +84,8 @@ exports.iniciarSesion = async (peticion, respuesta) => {
     });
 
     console.log(`Token generado para el nuevo usuario: ${token}`);
+    console.log("Usuario:", usuario);
+    console.log("Token generado al iniciar sesión:", token);
 
     // Configurar la cookie con el token
     respuesta.cookie("token", token, {
@@ -105,28 +107,5 @@ exports.cerrarSesion = async (peticion, respuesta) => {
     respuesta.status(200).json({ message: "Sesión cerrada exitosamente" });
   } catch (error) {
     respuesta.status(500).json({ message: "Error al cerrar sesión", error });
-  }
-};
-
-exports.verificarToken = async (peticion, respuesta) => {
-  try {
-    const usuarioDesdeToken = peticion.usuario;
-
-    console.log("authControlador - usuarioDesdeToken:", usuarioDesdeToken);
-
-    if (!usuarioDesdeToken) {
-      return respuesta.status(401).json({ mensaje: "No autorizado" });
-    }
-
-    const usuarioEnBaseDeDatos = await Usuario.findById(usuarioDesdeToken.id);
-
-    console.log("authControlador:", usuarioEnBaseDeDatos);
-
-    if (!usuarioEnBaseDeDatos) {
-      return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });
-    }
-    respuesta.status(200).json({ usuario: usuarioEnBaseDeDatos });
-  } catch (error) {
-    respuesta.status(500).json({ mensaje: "Error en el servidor", error });
   }
 };
