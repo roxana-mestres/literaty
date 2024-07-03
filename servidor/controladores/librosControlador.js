@@ -23,11 +23,9 @@ const buscarLibros = async (peticion, respuesta) => {
 
 const obtenerLibros = async (peticion, respuesta) => {
   const emailUsuario = peticion.body.email;
-  console.log("emailUsuario desde petición - obtenerLibros:", emailUsuario);
 
   try {
     const usuarioId = await obtenerIdDelUsuarioPorEmail(emailUsuario);
-    console.log("usuarioId obtenido:", usuarioId);
 
     if (!usuarioId) {
       return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });

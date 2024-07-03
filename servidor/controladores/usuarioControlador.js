@@ -5,7 +5,6 @@ const obtenerIdDelUsuarioPorEmail = async (email) => {
     const usuario = await Usuario.findOne({ email }).select('_id');
     return usuario ? usuario._id : null;
   } catch (error) {
-    console.error("Error al obtener ID del usuario por email:", error);
     throw new Error("Error al obtener ID del usuario por email");
   }
 };

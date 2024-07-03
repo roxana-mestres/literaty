@@ -1,8 +1,10 @@
 import principal from "../../estilos/PaginaPrincipal.module.css";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 
 function ComponenteItemLibro({ libro, onEliminar, ...props }) {
 
+  const navegar = useNavigate();
 
   const estiloTextoTitulo = {
     color: props.colorTextoTitulo,
@@ -37,13 +39,19 @@ function ComponenteItemLibro({ libro, onEliminar, ...props }) {
     }
   };
 
+  const handlePortadaClick = () => {
+    navegar("/resena", { state: { libro } });
+  };
+
   return (
     <div className={`${principal["div-libro-notas"]} ${props.className}`}>
       <div
         className={principal["portada-libro"]}
         style={{
           backgroundImage: `url(${libro.image})`,
+          cursor: "pointer",
         }}
+        onClick={handlePortadaClick}
       ></div>
       <div className={principal["datos-libro-notas"]}>
         <p style={estiloTextoTitulo}>{tituloCortado}</p>
@@ -102,6 +110,7 @@ ComponenteItemLibro.propTypes = {
     mainCategory: PropTypes.string,
     averageRating: PropTypes.number,
     image: PropTypes.string,
+    description: PropTypes.string,
   }).isRequired,
   onEliminar: PropTypes.func.isRequired,
 };

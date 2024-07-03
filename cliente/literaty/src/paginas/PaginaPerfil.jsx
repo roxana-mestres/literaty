@@ -1,23 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLibros } from "../contextos/contextoLibros";
 import NombreBuscador from "../componentes/PaginaPerfil/ComponenteNombreBuscador";
 import SeccionLibros from "../componentes/PaginaPerfil/ComponenteSeccionLibros";
 import BotonSubir from "../componentes/PaginaPerfil/ComponenteBotonSubir";
 import Footer from "../componentes/PaginaPerfil/ComponenteFooter";
 import principal from "../estilos/PaginaPrincipal.module.css";
+import resena from "../estilos/PaginaResena.module.css";
 
 function PaginaPerfil() {
   const navegar = useNavigate();
+  const { libros, cargando, obtenerLibros, handleEliminarLibro } = useLibros();
   const [mostrarPopup, setMostrarPopup] = useState(false);
-  const [libros, setLibros] = useState([]);
-  const [cargando, setCargando] = useState(false);
-  const [emailUsuario, setEmailUsuario] = useState(
-    "roxana.mestres@hotmail.com"
-  );
-
-  useEffect(() => {
-    obtenerLibros();
-  }, []);
 
   const onIconClick = (icono) => {
     if (icono === "person") {
@@ -25,45 +19,13 @@ function PaginaPerfil() {
     } else if (icono === "bookmark") {
       navegar("/listas");
     } else if (icono === "refresh") {
-      window.location.reload();
+      obtenerLibros();
     }
   };
 
-  const obtenerLibros = async (intentos = 3) => {
-    setCargando(true);
-    let data = [];
-    for (let i = 0; i < intentos; i++) {
-      try {
-        const respuesta = await fetch("http://localhost:3000/api/libros", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: emailUsuario }),
-        });
-
-        if (respuesta.ok) {
-          data = await respuesta.json();
-
-          if (data.length >= 12) {
-            break;
-          }
-        } else {
-          console.error("Error al obtener libros");
-        }
-      } catch (error) {
-        console.error("Error al obtener libros:", error);
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    }
-
-    if (data.length < 12) {
-      console.warn("No se pudieron obtener 12 libros, se obtuvo:", data.length);
-    }
-
-    setLibros(data);
-    setCargando(false);
+  const handleLinkClick = (ruta) => {
+    setMostrarPopup(false);
+    navegar(ruta);
   };
 
   const handleBusqueda = async (termino) => {
@@ -84,28 +46,27 @@ function PaginaPerfil() {
     }
   };
 
-  const handleEliminarLibro = async (id) => {
-    const emailUsuario = "roxana.mestres@hotmail.com";
-    try {
-      console.log(`Enviando solicitud DELETE para el libro con ID: ${id}`);
-      console.log(`Email del usuario: ${emailUsuario}`);
-      const respuesta = await fetch(`http://localhost:3000/api/libros/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: emailUsuario }),
-      });
-
-      if (respuesta.ok) {
-        setLibros((prevLibros) =>
-          prevLibros.filter((libro) => libro.id !== id)
+  const handleCerrarSesion = async (e) => {
+    e.preventDefault();
+    if (mostrarPopup) {
+      try {
+        const respuesta = await fetch(
+          "http://localhost:3000/api/cerrar-sesion",
+          {
+            method: "POST",
+            credentials: "include",
+          }
         );
-      } else {
-        console.error("Error al eliminar libro");
+
+        if (respuesta.ok) {
+          console.log("Cierre de sesión exitoso");
+          navegar("/");
+        } else {
+          console.error("Error al cerrar sesión");
+        }
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
       }
-    } catch (error) {
-      console.error("Error al eliminar libro:", error);
     }
   };
 
@@ -120,11 +81,31 @@ function PaginaPerfil() {
           onEliminarLibro={handleEliminarLibro}
         />
       )}
-      <BotonSubir colorBoton="#252627" />
       <Footer
         iconos={["bookmark", "refresh", "person"]}
         onIconClick={onIconClick}
       />
+      {mostrarPopup && (
+        <>
+          <div
+            className={resena["popup-fondo"]}
+            onClick={() => setMostrarPopup(false)}
+          />
+          <div className={resena["popup-derecha"]}>
+            <ul>
+              <li>
+                <button onClick={() => handleLinkClick("/editar-perfil")}>
+                  Editar perfil
+                </button>
+              </li>
+              <li>
+                <button onClick={handleCerrarSesion}>Cerrar sesión</button>
+              </li>
+            </ul>
+          </div>
+        </>
+      )}
+      <BotonSubir colorBoton="#252627" />
     </div>
   );
 }
