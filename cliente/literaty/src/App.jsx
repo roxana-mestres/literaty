@@ -11,6 +11,7 @@ import PaginaIniciarSesion from "./paginas/PaginaIniciarSesion";
 import PaginaCrearCuenta from "./paginas/PaginaCrearCuenta";
 import PaginaPerfil from "./paginas/PaginaPerfil";
 import PaginaResena from "./paginas/PaginaResena"
+import PaginaListas from "./paginas/PaginaListas";
 import Pagina401 from "./paginas/Pagina401";
 import Pagina404 from "./paginas/Pagina404";
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/crear-cuenta" element={<PaginaCrearCuenta />} />
           <Route path="/perfil" element={<PaginaPerfil />} />
           <Route path="/resena" element={<PaginaResena />} />
+          <Route path="/listas" element={<PaginaListas />} />
           <Route path="/pagina-401" element={<Pagina401 />} />
           <Route path="/pagina-404" element={<Pagina404 />} />
           <Route path="*" element={<Navigate to="/pagina-404" />} />

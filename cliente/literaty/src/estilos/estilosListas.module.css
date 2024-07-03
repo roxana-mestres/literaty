@@ -4,20 +4,26 @@ div.div-general {
 }
 .div-iconos-mas {
   width: 80vw;
+  margin-top: 100px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
+
 .h1-listas {
   display: flex;
   margin-top: 50px;
   margin-left: 50px;
 }
 .titulo {
-  margin-top: 20px;
-  margin-left: 50px;
+  position: absolute;
+  top: 5%;
+  left: 150px;
   margin-bottom: 50px;
   color: #252627;
+}
+a span{
+  left: 3%;
 }
 .circulo {
   display: flex;

@@ -58,6 +58,14 @@ const obtenerLibros = async (peticion, respuesta) => {
     const librosEliminados =
       librosEliminadosPorUsuario.get(usuarioId) || new Set();
 
+    const generosExcluidos = new Set([
+      "juvenile fiction",
+      "juvenile nonfiction",
+      "education",
+      "children's stories",
+      "animals"
+    ]);
+
     while (librosFiltrados.length < cantidadDeseada && intentos < maxIntentos) {
       const indiceInicio = Math.floor(Math.random() * 500);
       intentos++;
@@ -72,7 +80,11 @@ const obtenerLibros = async (peticion, respuesta) => {
           const volumenInfo = libro.volumeInfo || {};
           const categorias = volumenInfo.categories || [];
           const libroId = libro.id || "";
+          const categoriasValidas = categorias.every(
+            (categoria) => !generosExcluidos.has(categoria.toLowerCase())
+          );
           return (
+            categoriasValidas &&
             !librosEliminados.has(libroId) &&
             categorias.length > 0 &&
             categorias[0] !== "Unknown" &&
