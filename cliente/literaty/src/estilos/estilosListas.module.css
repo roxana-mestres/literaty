@@ -48,6 +48,7 @@ a span{
   align-items: center;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 }
 .circulo-contenedor {
   min-height: 170px;
@@ -63,6 +64,7 @@ a span{
   max-width: 80px;
 }
 .titulo-lista {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
