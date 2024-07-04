@@ -2,8 +2,7 @@ import principal from "../../estilos/PaginaPrincipal.module.css";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
-function ComponenteItemLibro({ libro, onEliminar, ...props }) {
-
+function ComponenteItemLibro({ libro, onEliminar, onBookmarkClick, ...props }) {
   const navegar = useNavigate();
 
   const estiloTextoTitulo = {
@@ -34,13 +33,20 @@ function ComponenteItemLibro({ libro, onEliminar, ...props }) {
     autores.length > 25 ? autores.slice(0, 25) + "..." : autores;
 
   const handleEliminar = () => {
-    if (onEliminar) {
+    if (onEliminar && libro.id) {
       onEliminar(libro.id);
     }
   };
 
   const handlePortadaClick = () => {
     navegar("/resena", { state: { libro } });
+  };
+
+  const handleBookmarkClick = (e) => {
+    e.stopPropagation();
+    if (onBookmarkClick) {
+      onBookmarkClick(libro);
+    }
   };
 
   return (
@@ -80,6 +86,7 @@ function ComponenteItemLibro({ libro, onEliminar, ...props }) {
           <span
             className="material-symbols-outlined"
             style={{ estiloIcono, cursor: "pointer" }}
+            onClick={handleBookmarkClick}
           >
             bookmark
           </span>
@@ -113,6 +120,7 @@ ComponenteItemLibro.propTypes = {
     description: PropTypes.string,
   }).isRequired,
   onEliminar: PropTypes.func.isRequired,
+  onBookmarkClick: PropTypes.func.isRequired,
 };
 
 export default ComponenteItemLibro;

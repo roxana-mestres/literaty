@@ -110,6 +110,31 @@ p {
   margin-bottom: 30px;
 }
 
+/* POPUP LISTAS */
+
+.popup-lista-libros {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #f4e5e0;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  border-radius: 5px;
+  border: solid 3px #222;
+}
+
+.popup-fondo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9;
+}
+
 /*FOOTER*/
 div.footer {
   position: fixed;

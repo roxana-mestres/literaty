@@ -2,9 +2,11 @@ import PropTypes from "prop-types";
 import ComponenteItemLibro from "./ComponenteItemLibro";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 
-function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro }) {
+function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro, onBookmarkClick }) {
+  console.log("libros google book:", librosGoogleBooks)
   const librosConImagen = librosGoogleBooks.filter((libro) => {
     const volumeInfo = libro.volumeInfo || {};
+    
     return volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail;
   });
 
@@ -16,7 +18,7 @@ function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro }) {
           <div key={`${libro.id}`} className={`${principal["item-libro"]}`}>
             <ComponenteItemLibro
               libro={{
-                id: libro.id,
+                id: libro.id || "", 
                 title: volumeInfo.title,
                 authors: volumeInfo.authors || [],
                 mainCategory: volumeInfo.categories
@@ -30,6 +32,7 @@ function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro }) {
               }}
               mostrarDiv={true}
               onEliminar={onEliminarLibro}
+              onBookmarkClick={onBookmarkClick}
             />
           </div>
         );
@@ -55,6 +58,7 @@ ComponenteSeccionLibros.propTypes = {
     })
   ).isRequired,
   onEliminarLibro: PropTypes.func.isRequired,
+  onBookmarkClick: PropTypes.func.isRequired, 
 };
 
 export default ComponenteSeccionLibros;

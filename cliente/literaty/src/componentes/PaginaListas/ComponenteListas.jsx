@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import estilos from "../../estilos/Comunes.module.css";
 import resena from "../../estilos/PaginaResena.module.css";
@@ -15,17 +15,13 @@ const iconosLibros = [
   "/src/assets/libro-5.svg",
   "/src/assets/libro-6.svg",
 ];
+const usuarioId = "6686d98dc48ba205fb80895e";
 
 function ComponenteListas() {
-  const [listasDeLibros, setListasDeLibros] = useState([
-    {
-      nombre: "Me gustan",
-      icono: iconosLibros[0],
-      editable: false,
-    },
-  ]);
+  const [listasDeLibros, setListasDeLibros] = useState([]);
   const [libros, setLibros] = useState([
     {
+      id: "123", 
       titulo: "Crimen y Castigo",
       autor: "Fiodor Dostoievski",
       genero: "Ficción literaria",
@@ -35,21 +31,109 @@ function ComponenteListas() {
   ]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
 
-  const agregarLista = () => {
-    const nuevoIndice = listasDeLibros.length % iconosLibros.length;
-    const nuevaLista = {
-      nombre: `Nueva Lista ${listasDeLibros.length + 1}`,
-      icono: iconosLibros[nuevoIndice],
-      editable: true,
+  useEffect(() => {
+    const fetchListas = async () => {
+      const usuarioId = "6686d98dc48ba205fb80895e";
+      try {
+        console.log(`Fetching listas for usuarioId: ${usuarioId}`);
+        const respuesta = await fetch(
+          `http://localhost:3000/api/usuarios/${usuarioId}/listas`
+        );
+        console.log("Respuesta fetch:", respuesta);
+        if (!respuesta.ok) {
+          throw new Error("Error al obtener las listas");
+        }
+        let data = await respuesta.json();
+        console.log("Datos obtenidos:", data);
+
+        data = data.map((lista, index) => ({
+          ...lista,
+          icono: lista.icono || iconosLibros[index % iconosLibros.length],
+        }));
+
+
+        setListasDeLibros(data);
+      } catch (error) {
+        console.error("Error al obtener las listas:", error);
+      }
     };
-    setListasDeLibros([...listasDeLibros, nuevaLista]);
+
+    if (usuarioId) {
+      fetchListas();
+    }
+  }, [usuarioId]);
+
+  const agregarLista = async () => {
+    try {
+      const usuarioId = "6686d98dc48ba205fb80895e";
+
+      const nuevoIndice = listasDeLibros.length % iconosLibros.length;
+      const nuevaLista = {
+        nombre: `Nueva Lista ${listasDeLibros.length + 1}`,
+        icono: iconosLibros[nuevoIndice],
+        editable: false,
+        libros: [],
+      };
+
+      console.log("Enviando solicitud para crear lista con datos:", nuevaLista);
+
+      const respuesta = await fetch(
+        `http://localhost:3000/api/usuarios/${usuarioId}/listas`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nombre: nuevaLista.nombre }),
+        }
+      );
+      console.log("Respuesta de la solicitud:", respuesta);
+      if (respuesta.ok) {
+        const data = await respuesta.json();
+        console.log("Datos de la respuesta:", data);
+        setListasDeLibros([
+          ...listasDeLibros,
+          { ...nuevaLista, _id: data._id },
+        ]);
+      } else {
+        console.error("Error al crear la lista");
+      }
+    } catch (error) {
+      console.error("Error al crear la lista:", error);
+    }
   };
 
-  const eliminarLista = (index) => {
+  const eliminarLista = async (index) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta lista?")) {
-      const nuevasListas = listasDeLibros.filter((_, i) => i !== index);
-      setListasDeLibros(nuevasListas);
-      setIndiceSeleccionado(null);
+      const listaId = listasDeLibros[index]._id;
+      const usuarioId = "6686d98dc48ba205fb80895e";
+      console.log("ID de la lista a eliminar:", listaId);
+      try {
+        const respuesta = await fetch(
+          `http://localhost:3000/api/usuarios/${usuarioId}/listas/${listaId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        console.log("Respuesta de la solicitud de eliminación:", respuesta);
+
+        if (respuesta.ok) {
+          const nuevasListas = listasDeLibros.filter((_, i) => i !== index);
+          setListasDeLibros(nuevasListas);
+          setIndiceSeleccionado(null);
+          console.log("Lista eliminada y estado actualizado.");
+        } else {
+          console.error(
+            "Error al eliminar la lista. Estado:",
+            respuesta.status
+          );
+          const errorText = await respuesta.text();
+          console.error("Texto del error:", errorText);
+        }
+      } catch (error) {
+        console.error("Error al eliminar la lista:", error);
+      }
     }
   };
 
@@ -175,7 +259,8 @@ function ComponenteListas() {
                       backgroundColor: "transparent",
                       border: "none",
                       fontSize: "16px",
-                      width:"150px"
+                      width: "120px",
+                      marginLeft: "50px",
                     }}
                   />
                 ) : (
@@ -196,6 +281,8 @@ function ComponenteListas() {
               <ItemLibro
                 libro={libro}
                 mostrarDiv={true}
+                onEliminar={() => {}}
+                onBookmarkClick={() => {}} 
                 colorTextoTitulo="#f4e5e0"
                 colorTextoGenero="#252627"
                 colorFondo="#f4e5e0"

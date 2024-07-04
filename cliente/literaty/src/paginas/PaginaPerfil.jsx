@@ -5,6 +5,7 @@ import NombreBuscador from "../componentes/PaginaPerfil/ComponenteNombreBuscador
 import SeccionLibros from "../componentes/PaginaPerfil/ComponenteSeccionLibros";
 import BotonSubir from "../componentes/PaginaPerfil/ComponenteBotonSubir";
 import Footer from "../componentes/PaginaPerfil/ComponenteFooter";
+import ComponentePopupListas from "../componentes/PaginaListas/ComponentePopupListas";
 import principal from "../estilos/PaginaPrincipal.module.css";
 import resena from "../estilos/PaginaResena.module.css";
 
@@ -12,6 +13,8 @@ function PaginaPerfil() {
   const navegar = useNavigate();
   const { libros, cargando, obtenerLibros, handleEliminarLibro } = useLibros();
   const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [libroSeleccionado, setLibroSeleccionado] = useState(null);
+  const [mostrarPopupListas, setMostrarPopupListas] = useState(false);
 
   const onIconClick = (icono) => {
     if (icono === "person") {
@@ -70,6 +73,16 @@ function PaginaPerfil() {
     }
   };
 
+  const abrirPopupLista = (libro) => {
+    setLibroSeleccionado(libro);
+    setMostrarPopupListas(true);
+  };
+
+  const cerrarPopupLista = () => {
+    setMostrarPopupListas(false);
+    setLibroSeleccionado(null);
+  };
+
   return (
     <div>
       <NombreBuscador onBusqueda={handleBusqueda} />
@@ -79,6 +92,7 @@ function PaginaPerfil() {
         <SeccionLibros
           librosGoogleBooks={libros}
           onEliminarLibro={handleEliminarLibro}
+          onBookmarkClick={abrirPopupLista}
         />
       )}
       <Footer
@@ -104,6 +118,12 @@ function PaginaPerfil() {
             </ul>
           </div>
         </>
+      )}
+      {mostrarPopupListas && (
+        <ComponentePopupListas
+          libro={libroSeleccionado}
+          onClose={cerrarPopupLista}
+        />
       )}
       <BotonSubir colorBoton="#252627" />
     </div>

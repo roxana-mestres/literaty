@@ -23,13 +23,21 @@ exports.crearCuenta = async (peticion, respuesta) => {
     // Hashear la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear un nuevo usuario
     const nuevoUsuario = new Usuario({
       nombre,
       email,
       password: hashedPassword,
       avatar,
+      listas: [
+        {
+          nombre: "Me gusta",
+          icono: null,
+          editable: false,
+          libros: []
+        }
+      ]
     });
+
     await nuevoUsuario.save();
 
     // Crear token JWT
