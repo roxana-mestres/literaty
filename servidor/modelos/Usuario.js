@@ -5,7 +5,7 @@ const ListaSchema = new Schema({
   nombre: { type: String, required: true },
   icono: { type: String },
   editable: { type: Boolean, default: false },
-  libros: [{ type: Schema.Types.ObjectId, ref: 'Libro' }]
+  libros: [String],
 });
 
 const usuarioSchema = new Schema(

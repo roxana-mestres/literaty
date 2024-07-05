@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLibros } from "../contextos/contextoLibros";
 import NombreBuscador from "../componentes/PaginaPerfil/ComponenteNombreBuscador";
@@ -15,6 +15,28 @@ function PaginaPerfil() {
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
   const [mostrarPopupListas, setMostrarPopupListas] = useState(false);
+  const [listasDeLibros, setListasDeLibros] = useState([]);
+
+  useEffect(() => {
+    const fetchListas = async () => {
+      const usuarioId = "6686d98dc48ba205fb80895e";
+      try {
+        console.log(`Fetching listas for usuarioId: ${usuarioId}`);
+        const respuesta = await fetch(
+          `http://localhost:3000/api/usuarios/${usuarioId}/listas`
+        );
+        if (!respuesta.ok) {
+          throw new Error("Error al obtener las listas");
+        }
+        let data = await respuesta.json();
+        setListasDeLibros(data);
+      } catch (error) {
+        console.error("Error al obtener las listas:", error);
+      }
+    };
+
+    fetchListas();
+  }, []);
 
   const onIconClick = (icono) => {
     if (icono === "person") {
@@ -123,6 +145,7 @@ function PaginaPerfil() {
         <ComponentePopupListas
           libro={libroSeleccionado}
           onClose={cerrarPopupLista}
+          listasDeLibros={listasDeLibros}
         />
       )}
       <BotonSubir colorBoton="#252627" />

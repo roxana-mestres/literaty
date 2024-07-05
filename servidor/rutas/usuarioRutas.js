@@ -11,9 +11,7 @@ router.get("/perfil", (peticion, respuesta) => {
 router.post('/usuarios/:id/listas', controladorUsuario.crearLista);
 router.post('/usuarios/listas/:listaId', controladorUsuario.agregarLibroALista);
 router.delete('/usuarios/:usuarioId/listas/:listaId', controladorUsuario.eliminarLista);
-router.get("/usuarios/:usuarioId/listas", (peticion, respuesta, siguiente) => {
-  console.log("Ruta /usuarios/:id/listas llamada");
-  siguiente();
-}, controladorUsuario.obtenerListas);
+router.delete('/usuarios/:usuarioId/listas/:listaId/libros/:libroId', controladorUsuario.eliminarLibroDeLista);
+router.get("/usuarios/:usuarioId/listas", controladorUsuario.obtenerListas);
 
 module.exports = router;

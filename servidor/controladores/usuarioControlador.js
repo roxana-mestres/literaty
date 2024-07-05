@@ -44,28 +44,37 @@ const crearLista = async (peticion, respuesta) => {
 };
 
 const agregarLibroALista = async (peticion, respuesta) => {
-  const { usuarioId, listaId } = peticion.params;
-  const { libroId } = peticion.body;
+  const { listaId } = peticion.params;
+  const { libroId, usuarioId } = peticion.body;
+
+  console.log("Agregar libro a lista:", { listaId, libroId, usuarioId });
 
   try {
     const usuario = await Usuario.findById(usuarioId);
     if (!usuario) {
+      console.log('Usuario no encontrado');
       return respuesta.status(404).json({ message: "Usuario no encontrado" });
     }
 
     const lista = usuario.listas.id(listaId);
     if (!lista) {
+      console.log('Lista no encontrada');
       return respuesta.status(404).json({ message: "Lista no encontrada" });
+    }
+
+    if (lista.libros.includes(libroId)) {
+      console.log('El libro ya está en la lista');
+      return respuesta.status(200).json(lista);
     }
 
     lista.libros.push(libroId);
     await usuario.save();
 
+    console.log('Libro agregado a la lista:', lista);
     respuesta.status(200).json(lista);
   } catch (error) {
-    respuesta
-      .status(500)
-      .json({ message: "Error al agregar el libro a la lista", error });
+    console.error('Error al agregar el libro a la lista:', error);
+    respuesta.status(500).json({ message: "Error al agregar el libro a la lista", error });
   }
 };
 
@@ -114,10 +123,36 @@ const eliminarLista = async (peticion, respuesta) => {
   }
 };
 
+const eliminarLibroDeLista = async (peticion, respuesta) => {
+  const { usuarioId, listaId, libroId } = peticion.params;
+
+  try {
+    const usuario = await Usuario.findById(usuarioId);
+    if (!usuario) {
+      return respuesta.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const lista = usuario.listas.id(listaId);
+    if (!lista) {
+      return respuesta.status(404).json({ message: "Lista no encontrada" });
+    }
+
+    lista.libros.pull(libroId);
+    await usuario.save();
+
+    respuesta.status(200).json(lista);
+  } catch (error) {
+    respuesta
+      .status(500)
+      .json({ message: "Error al eliminar el libro de la lista", error });
+  }
+};
+
 module.exports = {
   obtenerIdDelUsuarioPorEmail,
   crearLista,
   agregarLibroALista,
   obtenerListas,
   eliminarLista,
+  eliminarLibroDeLista,
 };
