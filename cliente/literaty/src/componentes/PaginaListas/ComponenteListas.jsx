@@ -15,13 +15,13 @@ const iconosLibros = [
   "/src/assets/libro-5.svg",
   "/src/assets/libro-6.svg",
 ];
-const usuarioId = "6686d98dc48ba205fb80895e";
+const usuarioId = "6689417fcb2aed7a66f98840";
 
 function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);
   const [libros, setLibros] = useState([
     {
-      id: "123", 
+      id: "123",
       titulo: "Crimen y Castigo",
       autor: "Fiodor Dostoievski",
       genero: "Ficción literaria",
@@ -33,7 +33,7 @@ function ComponenteListas() {
 
   useEffect(() => {
     const fetchListas = async () => {
-      const usuarioId = "6686d98dc48ba205fb80895e";
+      const usuarioId = "6689417fcb2aed7a66f98840";
       try {
         console.log(`Fetching listas for usuarioId: ${usuarioId}`);
         const respuesta = await fetch(
@@ -51,7 +51,6 @@ function ComponenteListas() {
           icono: lista.icono || iconosLibros[index % iconosLibros.length],
         }));
 
-
         setListasDeLibros(data);
       } catch (error) {
         console.error("Error al obtener las listas:", error);
@@ -65,7 +64,7 @@ function ComponenteListas() {
 
   const agregarLista = async () => {
     try {
-      const usuarioId = "6686d98dc48ba205fb80895e";
+      const usuarioId = "6689417fcb2aed7a66f98840";
 
       const nuevoIndice = listasDeLibros.length % iconosLibros.length;
       const nuevaLista = {
@@ -73,6 +72,7 @@ function ComponenteListas() {
         icono: iconosLibros[nuevoIndice],
         editable: false,
         libros: [],
+        protegida: false,
       };
 
       console.log("Enviando solicitud para crear lista con datos:", nuevaLista);
@@ -106,7 +106,7 @@ function ComponenteListas() {
   const eliminarLista = async (index) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta lista?")) {
       const listaId = listasDeLibros[index]._id;
-      const usuarioId = "6686d98dc48ba205fb80895e";
+      const usuarioId = "6689417fcb2aed7a66f98840";
       console.log("ID de la lista a eliminar:", listaId);
       try {
         const respuesta = await fetch(
@@ -148,8 +148,36 @@ function ComponenteListas() {
     setListasDeLibros(nuevasListas);
   };
 
-  const manejarClickLista = (index) => {
-    setIndiceSeleccionado(index);
+  const actualizarNombreLista = async (index) => {
+    const lista = listasDeLibros[index];
+    if (lista.protegida) {
+      alert("Esta lista no se puede editar");
+      return;
+    }
+
+    const listaId = lista._id;
+    const nuevoNombre = lista.nombre;
+
+    try {
+      const respuesta = await fetch(
+        `http://localhost:3000/api/usuarios/${usuarioId}/listas/${listaId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nombre: nuevoNombre }),
+        }
+      );
+
+      if (!respuesta.ok) {
+        throw new Error("Error al actualizar el nombre de la lista");
+      }
+
+      console.log("Nombre de la lista actualizado exitosamente");
+    } catch (error) {
+      console.error("Error al actualizar el nombre de la lista:", error);
+    }
   };
 
   const manejarBlurNombre = (index) => {
@@ -160,9 +188,20 @@ function ComponenteListas() {
       return lista;
     });
     setListasDeLibros(nuevasListas);
+    actualizarNombreLista(index);
+  };
+
+  const manejarClickLista = (index) => {
+    setIndiceSeleccionado(index);
   };
 
   const manejarEditarClick = (index) => {
+    const lista = listasDeLibros[index];
+    if (lista.protegida) {
+      alert("Esta lista no se puede editar");
+      return;
+    }
+
     const nuevasListas = listasDeLibros.map((lista, i) => {
       if (i === index) {
         return { ...lista, editable: true };
@@ -204,7 +243,7 @@ function ComponenteListas() {
                   alt="icono libro"
                   style={{ width: "100px", marginLeft: "20px" }}
                 />
-                {indiceSeleccionado === index && (
+                {indiceSeleccionado === index && lista.nombre !== "Me gusta" && (
                   <span
                     className="material-symbols-outlined"
                     style={{
@@ -223,7 +262,7 @@ function ComponenteListas() {
                     delete
                   </span>
                 )}
-                {indiceSeleccionado === index && (
+                {indiceSeleccionado === index && lista.nombre !== "Me gusta" && (
                   <span
                     className="material-symbols-outlined"
                     style={{
@@ -282,7 +321,7 @@ function ComponenteListas() {
                 libro={libro}
                 mostrarDiv={true}
                 onEliminar={() => {}}
-                onBookmarkClick={() => {}} 
+                onBookmarkClick={() => {}}
                 colorTextoTitulo="#f4e5e0"
                 colorTextoGenero="#252627"
                 colorFondo="#f4e5e0"

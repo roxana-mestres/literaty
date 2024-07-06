@@ -33,7 +33,8 @@ exports.crearCuenta = async (peticion, respuesta) => {
           nombre: "Me gusta",
           icono: null,
           editable: false,
-          libros: []
+          libros: [],
+          protegida: true
         }
       ]
     });

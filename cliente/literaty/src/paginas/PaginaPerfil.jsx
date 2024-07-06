@@ -19,7 +19,7 @@ function PaginaPerfil() {
 
   useEffect(() => {
     const fetchListas = async () => {
-      const usuarioId = "6686d98dc48ba205fb80895e";
+      const usuarioId = "6689417fcb2aed7a66f98840";
       try {
         console.log(`Fetching listas for usuarioId: ${usuarioId}`);
         const respuesta = await fetch(

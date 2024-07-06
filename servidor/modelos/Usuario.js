@@ -6,6 +6,7 @@ const ListaSchema = new Schema({
   icono: { type: String },
   editable: { type: Boolean, default: false },
   libros: [String],
+  protegida: { type: Boolean, default: false }
 });
 
 const usuarioSchema = new Schema(

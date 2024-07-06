@@ -13,13 +13,13 @@ const crearLista = async (peticion, respuesta) => {
   const { id } = peticion.params;
   const { nombre } = peticion.body;
 
-  console.log('ID del usuario:', id);
-  console.log('Nombre de la lista:', nombre);
+  console.log("ID del usuario:", id);
+  console.log("Nombre de la lista:", nombre);
 
   try {
     const usuario = await Usuario.findById(id);
     if (!usuario) {
-      console.log('Usuario no encontrado');
+      console.log("Usuario no encontrado");
       return respuesta.status(404).json({ message: "Usuario no encontrado" });
     }
 
@@ -27,7 +27,7 @@ const crearLista = async (peticion, respuesta) => {
       nombre,
       icono: null,
       editable: false,
-      libros: []
+      libros: [],
     };
 
     usuario.listas.push(nuevaLista);
@@ -35,10 +35,10 @@ const crearLista = async (peticion, respuesta) => {
 
     const listaCreada = usuario.listas[usuario.listas.length - 1];
 
-    console.log('Lista creada con éxito:', nuevaLista);
+    console.log("Lista creada con éxito:", nuevaLista);
     respuesta.status(201).json(listaCreada);
   } catch (error) {
-    console.error('Error al crear la lista:', error);
+    console.error("Error al crear la lista:", error);
     respuesta.status(500).json({ message: "Error al crear la lista", error });
   }
 };
@@ -52,29 +52,31 @@ const agregarLibroALista = async (peticion, respuesta) => {
   try {
     const usuario = await Usuario.findById(usuarioId);
     if (!usuario) {
-      console.log('Usuario no encontrado');
+      console.log("Usuario no encontrado");
       return respuesta.status(404).json({ message: "Usuario no encontrado" });
     }
 
     const lista = usuario.listas.id(listaId);
     if (!lista) {
-      console.log('Lista no encontrada');
+      console.log("Lista no encontrada");
       return respuesta.status(404).json({ message: "Lista no encontrada" });
     }
 
     if (lista.libros.includes(libroId)) {
-      console.log('El libro ya está en la lista');
+      console.log("El libro ya está en la lista");
       return respuesta.status(200).json(lista);
     }
 
     lista.libros.push(libroId);
     await usuario.save();
 
-    console.log('Libro agregado a la lista:', lista);
+    console.log("Libro agregado a la lista:", lista);
     respuesta.status(200).json(lista);
   } catch (error) {
-    console.error('Error al agregar el libro a la lista:', error);
-    respuesta.status(500).json({ message: "Error al agregar el libro a la lista", error });
+    console.error("Error al agregar el libro a la lista:", error);
+    respuesta
+      .status(500)
+      .json({ message: "Error al agregar el libro a la lista", error });
   }
 };
 
@@ -101,25 +103,36 @@ const eliminarLista = async (peticion, respuesta) => {
   try {
     const usuario = await Usuario.findById(usuarioId);
     if (!usuario) {
-      console.log('Usuario no encontrado');
+      console.log("Usuario no encontrado");
       return respuesta.status(404).json({ message: "Usuario no encontrado" });
     }
 
+    const lista = usuario.listas.id(listaId);
+    if (!lista) {
+      return respuesta.status(404).json({ message: "Lista no encontrada" });
+    }
+
+    if (lista.protegida) {
+      return respuesta.status(403).json({ message: "No se puede eliminar una lista protegida" });
+    }
+
     const resultado = await Usuario.updateOne(
-      { _id: usuarioId, 'listas._id': listaId },
+      { _id: usuarioId, "listas._id": listaId },
       { $pull: { listas: { _id: listaId } } }
     );
 
     if (resultado.modifiedCount === 0) {
-      console.log('Lista no encontrada');
+      console.log("Lista no encontrada");
       return respuesta.status(404).json({ message: "Lista no encontrada" });
     }
 
-    console.log('Lista eliminada con éxito');
+    console.log("Lista eliminada con éxito");
     respuesta.status(200).json({ message: "Lista eliminada correctamente" });
   } catch (error) {
-    console.error('Error al eliminar la lista:', error);
-    respuesta.status(500).json({ message: "Error al eliminar la lista", error });
+    console.error("Error al eliminar la lista:", error);
+    respuesta
+      .status(500)
+      .json({ message: "Error al eliminar la lista", error });
   }
 };
 
@@ -148,6 +161,37 @@ const eliminarLibroDeLista = async (peticion, respuesta) => {
   }
 };
 
+const actualizarNombreLista = async (peticion, respuesta) => {
+  const { usuarioId, listaId } = peticion.params;
+  const { nombre } = peticion.body;
+
+  try {
+    const usuario = await Usuario.findById(usuarioId);
+    if (!usuario) {
+      return respuesta.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const lista = usuario.listas.id(listaId);
+    if (!lista) {
+      return respuesta.status(404).json({ message: "Lista no encontrada" });
+    }
+
+    if (lista.protegida) {
+      return respuesta.status(403).json({ message: "No se puede editar una lista protegida" });
+    }
+
+    lista.nombre = nombre;
+    await usuario.save();
+
+    respuesta.status(200).json(lista);
+  } catch (error) {
+    console.error("Error al actualizar el nombre de la lista:", error);
+    respuesta
+      .status(500)
+      .json({ message: "Error al actualizar el nombre de la lista", error });
+  }
+};
+
 module.exports = {
   obtenerIdDelUsuarioPorEmail,
   crearLista,
@@ -155,4 +199,5 @@ module.exports = {
   obtenerListas,
   eliminarLista,
   eliminarLibroDeLista,
+  actualizarNombreLista,
 };

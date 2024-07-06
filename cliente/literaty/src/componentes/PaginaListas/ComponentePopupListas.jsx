@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 
-const usuarioId = "6686d98dc48ba205fb80895e";
+const usuarioId = "6689417fcb2aed7a66f98840";
 
 function ComponentePopupListas({ libro, onClose, listasDeLibros }) {
   const [listasSeleccionadas, setListasSeleccionadas] = useState([]);

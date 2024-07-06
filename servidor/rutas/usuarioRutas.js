@@ -13,5 +13,6 @@ router.post('/usuarios/listas/:listaId', controladorUsuario.agregarLibroALista);
 router.delete('/usuarios/:usuarioId/listas/:listaId', controladorUsuario.eliminarLista);
 router.delete('/usuarios/:usuarioId/listas/:listaId/libros/:libroId', controladorUsuario.eliminarLibroDeLista);
 router.get("/usuarios/:usuarioId/listas", controladorUsuario.obtenerListas);
+router.put('/usuarios/:usuarioId/listas/:listaId', controladorUsuario.actualizarNombreLista);
 
 module.exports = router;
