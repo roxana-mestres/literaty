@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { buscarLibros, obtenerLibros, eliminarLibro } = require("../controladores/librosControlador");
+const { buscarLibros, obtenerLibros, eliminarLibro} = require("../controladores/librosControlador");
 
 // Ruta para buscar libros
 router.get("/buscar", buscarLibros);

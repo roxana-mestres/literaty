@@ -15,7 +15,7 @@ const iconosLibros = [
   "/src/assets/libro-5.svg",
   "/src/assets/libro-6.svg",
 ];
-const usuarioId = "6689417fcb2aed7a66f98840";
+const usuarioId = "668bafacde874b5e8bcbe4a3";
 
 function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);
@@ -33,11 +33,11 @@ function ComponenteListas() {
 
   useEffect(() => {
     const fetchListas = async () => {
-      const usuarioId = "6689417fcb2aed7a66f98840";
+      const usuarioId = "668bafacde874b5e8bcbe4a3";
       try {
         console.log(`Fetching listas for usuarioId: ${usuarioId}`);
         const respuesta = await fetch(
-          `http://localhost:3000/api/usuarios/${usuarioId}/listas`
+          `http://localhost:3000/api/listas/${usuarioId}`
         );
         console.log("Respuesta fetch:", respuesta);
         if (!respuesta.ok) {
@@ -64,8 +64,7 @@ function ComponenteListas() {
 
   const agregarLista = async () => {
     try {
-      const usuarioId = "6689417fcb2aed7a66f98840";
-
+      const usuarioId = "668bafacde874b5e8bcbe4a3";
       const nuevoIndice = listasDeLibros.length % iconosLibros.length;
       const nuevaLista = {
         nombre: `Nueva Lista ${listasDeLibros.length + 1}`,
@@ -78,16 +77,21 @@ function ComponenteListas() {
       console.log("Enviando solicitud para crear lista con datos:", nuevaLista);
 
       const respuesta = await fetch(
-        `http://localhost:3000/api/usuarios/${usuarioId}/listas`,
+        `http://localhost:3000/api/agregar-lista/${usuarioId}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ nombre: nuevaLista.nombre }),
+          body: JSON.stringify({
+            nombre: nuevaLista.nombre,
+            usuarioId: usuarioId,
+          }),
         }
       );
+
       console.log("Respuesta de la solicitud:", respuesta);
+
       if (respuesta.ok) {
         const data = await respuesta.json();
         console.log("Datos de la respuesta:", data);
@@ -97,6 +101,8 @@ function ComponenteListas() {
         ]);
       } else {
         console.error("Error al crear la lista");
+        const errorText = await respuesta.text();
+        console.error("Texto del error:", errorText);
       }
     } catch (error) {
       console.error("Error al crear la lista:", error);
@@ -106,11 +112,11 @@ function ComponenteListas() {
   const eliminarLista = async (index) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta lista?")) {
       const listaId = listasDeLibros[index]._id;
-      const usuarioId = "6689417fcb2aed7a66f98840";
+      const usuarioId = "668bafacde874b5e8bcbe4a3";
       console.log("ID de la lista a eliminar:", listaId);
       try {
         const respuesta = await fetch(
-          `http://localhost:3000/api/usuarios/${usuarioId}/listas/${listaId}`,
+          `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
           {
             method: "DELETE",
           }
@@ -160,7 +166,7 @@ function ComponenteListas() {
 
     try {
       const respuesta = await fetch(
-        `http://localhost:3000/api/usuarios/${usuarioId}/listas/${listaId}`,
+        `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
         {
           method: "PUT",
           headers: {
@@ -243,44 +249,46 @@ function ComponenteListas() {
                   alt="icono libro"
                   style={{ width: "100px", marginLeft: "20px" }}
                 />
-                {indiceSeleccionado === index && lista.nombre !== "Me gusta" && (
-                  <span
-                    className="material-symbols-outlined"
-                    style={{
-                      position: "absolute",
-                      cursor: "pointer",
-                      fontSize: "24px",
-                      right: "20px",
-                      top: "-50px",
-                      color: "#22222",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      eliminarLista(index);
-                    }}
-                  >
-                    delete
-                  </span>
-                )}
-                {indiceSeleccionado === index && lista.nombre !== "Me gusta" && (
-                  <span
-                    className="material-symbols-outlined"
-                    style={{
-                      position: "absolute",
-                      cursor: "pointer",
-                      fontSize: "24px",
-                      right: "50px",
-                      top: "-50px",
-                      color: "#22222",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      manejarEditarClick(index);
-                    }}
-                  >
-                    edit
-                  </span>
-                )}
+                {indiceSeleccionado === index &&
+                  lista.nombre !== "Me gusta" && (
+                    <span
+                      className="material-symbols-outlined"
+                      style={{
+                        position: "absolute",
+                        cursor: "pointer",
+                        fontSize: "24px",
+                        right: "20px",
+                        top: "-50px",
+                        color: "#22222",
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        eliminarLista(index);
+                      }}
+                    >
+                      delete
+                    </span>
+                  )}
+                {indiceSeleccionado === index &&
+                  lista.nombre !== "Me gusta" && (
+                    <span
+                      className="material-symbols-outlined"
+                      style={{
+                        position: "absolute",
+                        cursor: "pointer",
+                        fontSize: "24px",
+                        right: "50px",
+                        top: "-50px",
+                        color: "#22222",
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        manejarEditarClick(index);
+                      }}
+                    >
+                      edit
+                    </span>
+                  )}
                 {lista.editable ? (
                   <input
                     type="text"

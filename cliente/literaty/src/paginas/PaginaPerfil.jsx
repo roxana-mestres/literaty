@@ -19,11 +19,11 @@ function PaginaPerfil() {
 
   useEffect(() => {
     const fetchListas = async () => {
-      const usuarioId = "6689417fcb2aed7a66f98840";
+      const usuarioId = "668bafacde874b5e8bcbe4a3";
       try {
         console.log(`Fetching listas for usuarioId: ${usuarioId}`);
         const respuesta = await fetch(
-          `http://localhost:3000/api/usuarios/${usuarioId}/listas`
+          `http://localhost:3000/api/listas/${usuarioId}`
         );
         if (!respuesta.ok) {
           throw new Error("Error al obtener las listas");

@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const authRutas = require("./rutas/authRutas");
-const usuarioRutas = require("./rutas/usuarioRutas");
+const listasRutas = require("./rutas/listasRutas");
 const librosRutas = require("./rutas/librosRutas");
 const cors = require("cors");
 
@@ -33,7 +33,7 @@ mongoose
 
 // Rutas
 app.use("/api", authRutas);
-app.use('/api', usuarioRutas);
+app.use('/api', listasRutas);
 app.use("/api", librosRutas);
 
 // Ruta principal para servir el archivo index.html

@@ -1,141 +1,72 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import principal from "../../estilos/PaginaPrincipal.module.css";
+import { useListas } from "../../contextos/contextoListas";
 
-const usuarioId = "6689417fcb2aed7a66f98840";
-
-function ComponentePopupListas({ libro, onClose, listasDeLibros }) {
+function ComponentePopupListas({ libro, onClose }) {
+  const { listas, agregarLibroALista, eliminarLibroDeLista, cargandoListas } = useListas();
   const [listasSeleccionadas, setListasSeleccionadas] = useState([]);
+  const [cambiado, setCambiado] = useState(false); // Para rastrear si la selección cambió
 
   useEffect(() => {
-    const listasConLibro = listasDeLibros.filter((lista) =>
-      lista.libros.includes(libro.id)
-    );
-    setListasSeleccionadas(listasConLibro.map((lista) => lista._id));
-  }, [libro, listasDeLibros]);
-
-  const handleCambioCheckbox = async (listaId) => {
-    const seleccionado = listasSeleccionadas.includes(listaId);
-    console.log(
-      `Cambio en checkbox para lista ${listaId}: ${
-        seleccionado ? "Desmarcando" : "Marcando"
-      }`
-    );
-    if (seleccionado) {
-      try {
-        const respuesta = await fetch(
-          `http://localhost:3000/api/usuarios/${usuarioId}/listas/${listaId}/libros/${libro.id}`,
-          {
-            method: "DELETE",
-          }
-        );
-        if (!respuesta.ok) {
-          const errorText = await respuesta.text();
-          throw new Error(
-            `Error al eliminar el libro de la lista: ${errorText}`
-          );
-        }
-        const nuevasListasSeleccionadas = listasSeleccionadas.filter(
-          (id) => id !== listaId
-        );
-        setListasSeleccionadas(nuevasListasSeleccionadas);
-        console.log("Lista después de eliminación:", nuevasListasSeleccionadas);
-      } catch (error) {
-        console.error("Error al eliminar el libro de la lista:", error);
-      }
-    } else {
-      try {
-        const respuesta = await fetch(
-          `http://localhost:3000/api/usuarios/listas/${listaId}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ libroId: libro.id, usuarioId }),
-          }
-        );
-        if (!respuesta.ok) {
-          const errorText = await respuesta.text();
-          throw new Error(`Error al agregar el libro a la lista: ${errorText}`);
-        }
-        const nuevasListasSeleccionadas = [...listasSeleccionadas, listaId];
-        setListasSeleccionadas(nuevasListasSeleccionadas);
-        console.log("Lista después de adición:", nuevasListasSeleccionadas);
-      } catch (error) {
-        console.error("Error al agregar el libro a la lista:", error);
-      }
+    if (!cargandoListas) {
+      const listasConLibro = listas.filter((lista) =>
+        lista.libros.includes(libro.id)
+      );
+      setListasSeleccionadas(listasConLibro.map((lista) => lista._id));
     }
-  };
+  }, [libro, listas, cargandoListas]);
 
-  const actualizarListas = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/usuarios/${usuarioId}/listas`);
-      const listasActualizadas = await response.json();
-      setListasSeleccionadas(listasActualizadas.map((lista) => lista._id));
-    } catch (error) {
-      console.error('Error al obtener las listas actualizadas:', error);
-    }
+  const handleCambioCheckbox = (listaId) => {
+    setListasSeleccionadas((prev) => {
+      if (prev.includes(listaId)) {
+        // Si la lista ya está seleccionada, la desmarcamos
+        return prev.filter((id) => id !== listaId);
+      } else {
+        // Si la lista no está seleccionada, la marcamos
+        return [...prev, listaId];
+      }
+    });
+    setCambiado(true); // Marcamos que hubo un cambio
   };
 
   const handleGuardarEnListas = async () => {
-    try {
-      const operaciones = [];
-      const listasParaAgregar = listasDeLibros.filter(
-        (lista) =>
-          listasSeleccionadas.includes(lista._id) &&
-          !lista.libros.includes(libro.id)
-      );
-      const listasParaEliminar = listasDeLibros.filter(
-        (lista) =>
-          !listasSeleccionadas.includes(lista._id) &&
-          lista.libros.includes(libro.id)
-      );
+    // Cerrar el popup inmediatamente
+    onClose();
 
-      console.log("Listas para agregar:", listasParaAgregar);
-      console.log("Listas para eliminar:", listasParaEliminar);
+    // Realizar operaciones de guardado en segundo plano
+    setTimeout(async () => {
+      let mensaje = '';
+      try {
+        // Obtenemos las listas a eliminar
+        const listasParaEliminar = listas
+          .filter((lista) => !listasSeleccionadas.includes(lista._id) && lista.libros.includes(libro.id))
+          .map((lista) => lista._id);
 
-      listasParaAgregar.forEach((lista) => {
-        operaciones.push(
-          fetch(`http://localhost:3000/api/usuarios/listas/${lista._id}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ libroId: libro.id, usuarioId }),
-          })
-        );
-      });
+        // Obtenemos las listas a agregar
+        const listasParaAgregar = listasSeleccionadas.filter((id) => !listas.find((lista) => lista._id === id).libros.includes(libro.id));
 
-      listasParaEliminar.forEach((lista) => {
-        operaciones.push(
-          fetch(
-            `http://localhost:3000/api/usuarios/${usuarioId}/listas/${lista._id}/libros/${libro.id}`,
-            {
-              method: "DELETE",
-            }
-          )
-        );
-      });
+        // Eliminamos el libro de las listas seleccionadas que ya no están en la lista de selección
+        for (const listaId of listasParaEliminar) {
+          await eliminarLibroDeLista(listaId, libro.id);
+        }
 
-      await Promise.all(operaciones);
+        for (const listaId of listasParaAgregar) {
+          await agregarLibroALista(listaId, libro);
+        }
 
-      await actualizarListas();
+        if (listasParaEliminar.length > 0) {
+          mensaje = "El libro ha sido eliminado correctamente.";
+        }
 
-      if (listasParaAgregar.length > 0 && listasParaEliminar.length > 0) {
-        alert("El libro se ha actualizado correctamente en las listas.");
-      } else if (listasParaAgregar.length > 0) {
-        alert("El libro se ha guardado correctamente en las listas.");
-      } else if (listasParaEliminar.length > 0) {
-        alert("El libro se ha eliminado correctamente de las listas.");
-      } else {
-        alert("No se realizaron cambios.");
+        if (mensaje) {
+          alert(mensaje);
+        }
+      } catch (error) {
+        console.error("Error al guardar en listas:", error);
+        alert("Hubo un error al intentar guardar el libro en las listas.");
       }
-
-      onClose();
-    } catch (error) {
-      console.error("Error al guardar el libro en las listas:", error);
-    }
+    }, 0);
   };
 
   return (
@@ -145,22 +76,26 @@ function ComponentePopupListas({ libro, onClose, listasDeLibros }) {
         onClick={(e) => e.stopPropagation()}
       >
         <h3>Guardar en lista</h3>
-        <ul className={principal["lista"]}>
-          {listasDeLibros.map((lista) => (
-            <li key={lista._id} className={principal["item-lista"]}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={listasSeleccionadas?.includes(lista._id) || false}
-                  onChange={() => handleCambioCheckbox(lista._id)}
-                />
-                {lista.nombre}
-              </label>
-            </li>
-          ))}
-        </ul>
+        {cargandoListas ? (
+          <p></p>
+        ) : (
+          <ul className={principal["lista"]}>
+            {listas.map((lista) => (
+              <li key={lista._id} className={principal["item-lista"]}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={listasSeleccionadas.includes(lista._id)}
+                    onChange={() => handleCambioCheckbox(lista._id)}
+                  />
+                  {lista.nombre}
+                </label>
+              </li>
+            ))}
+          </ul>
+        )}
         <button onClick={onClose}>Cerrar</button>
-        <button onClick={handleGuardarEnListas}>Guardar</button>
+        <button onClick={handleGuardarEnListas} disabled={!cambiado}>Guardar</button>
       </div>
     </div>
   );
@@ -172,13 +107,6 @@ ComponentePopupListas.propTypes = {
     title: PropTypes.string.isRequired,
   }).isRequired,
   onClose: PropTypes.func.isRequired,
-  listasDeLibros: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      nombre: PropTypes.string.isRequired,
-      libros: PropTypes.arrayOf(PropTypes.string).isRequired,
-    })
-  ).isRequired,
 };
 
 export default ComponentePopupListas;
