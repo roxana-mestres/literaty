@@ -257,7 +257,78 @@ const obtenerLibrosDeLista = async (peticion, respuesta) => {
     respuesta.status(200).json(librosConDetalles);
   } catch (error) {
     console.error("Error al obtener los libros de la lista:", error);
-    respuesta.status(500).json({ message: "Error al obtener los libros de la lista", error });
+    respuesta
+      .status(500)
+      .json({ message: "Error al obtener los libros de la lista", error });
+  }
+};
+const handleAgregarLibroMeGusta = async (peticion, respuesta) => {
+  const { usuarioId } = peticion.params;
+  const { listaId, libroId } = peticion.body;
+
+  try {
+    const usuario = await Usuario.findById(usuarioId);
+    if (!usuario) {
+      return respuesta.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const lista = usuario.listas.id(listaId);
+    if (!lista) {
+      return respuesta.status(404).json({ message: "Lista no encontrada" });
+    }
+
+    if (lista.libros.includes(libroId)) {
+      return respuesta
+        .status(400)
+        .json({ message: "El libro ya está en la lista" });
+    }
+
+    lista.libros.push(libroId);
+    await usuario.save();
+
+    respuesta
+      .status(200)
+      .json({ message: "Libro agregado a la lista 'Me gusta'" });
+  } catch (error) {
+    console.error("Error al agregar el libro a la lista 'Me gusta':", error);
+    respuesta
+      .status(500)
+      .json({ message: "Error al agregar el libro a la lista 'Me gusta'" });
+  }
+};
+
+const handleEliminarLibroMeGusta = async (peticion, respuesta) => {
+  const { usuarioId } = peticion.params;
+  const { listaId, libroId } = peticion.body;
+
+  try {
+    const usuario = await Usuario.findById(usuarioId);
+    if (!usuario) {
+      return respuesta.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const lista = usuario.listas.id(listaId);
+    if (!lista) {
+      return respuesta.status(404).json({ message: "Lista no encontrada" });
+    }
+
+    if (!lista.libros.includes(libroId)) {
+      return respuesta
+        .status(400)
+        .json({ message: "El libro no está en la lista" });
+    }
+
+    lista.libros = lista.libros.filter((id) => id !== libroId);
+    await usuario.save();
+
+    respuesta
+      .status(200)
+      .json({ message: "Libro eliminado de la lista 'Me gusta'" });
+  } catch (error) {
+    console.error("Error al eliminar el libro de la lista 'Me gusta':", error);
+    respuesta
+      .status(500)
+      .json({ message: "Error al eliminar el libro de la lista 'Me gusta'" });
   }
 };
 
@@ -269,4 +340,6 @@ module.exports = {
   actualizarNombreLista,
   eliminarLibroDeLista,
   obtenerLibrosDeLista,
+  handleAgregarLibroMeGusta,
+  handleEliminarLibroMeGusta,
 };

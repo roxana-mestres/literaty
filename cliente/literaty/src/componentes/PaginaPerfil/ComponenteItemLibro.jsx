@@ -2,7 +2,14 @@ import principal from "../../estilos/PaginaPrincipal.module.css";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
-function ComponenteItemLibro({ libro, onEliminar, onBookmarkClick, ...props }) {
+function ComponenteItemLibro({
+  libro,
+  onEliminar,
+  onBookmarkClick,
+  favoritos,
+  handleHeartClick,
+  ...props
+}) {
   const navegar = useNavigate();
 
   const estiloTextoTitulo = {
@@ -49,6 +56,11 @@ function ComponenteItemLibro({ libro, onEliminar, onBookmarkClick, ...props }) {
     }
   };
 
+  const handleClickCorazon = (e) => {
+    e.stopPropagation();
+    handleHeartClick(libro.id);
+  };
+
   return (
     <div className={`${principal["div-libro-notas"]} ${props.className}`}>
       <div
@@ -78,10 +90,13 @@ function ComponenteItemLibro({ libro, onEliminar, onBookmarkClick, ...props }) {
       {props.mostrarDiv && (
         <div className={principal["iconos-libros-notas"]}>
           <span
-            className="material-symbols-outlined"
-            style={{ estiloIcono, cursor: "pointer" }}
+            className={`material-symbols-outlined ${
+              favoritos ? "icon-favorite" : "icon-border"
+            }`}
+            style={{ fontSize: "24px", cursor: "pointer" }}
+            onClick={handleClickCorazon}
           >
-            favorite
+            {favoritos ? "favorite" : "favorite_border"}
           </span>
           <span
             className="material-symbols-outlined"

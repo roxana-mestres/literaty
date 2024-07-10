@@ -112,6 +112,17 @@ a {
   cursor: pointer;
   color: #f4e5e0;
 }
+
+.material-icons-outlined.icon-favorite {
+  font-variation-settings:
+    'FILL' 1;
+}
+
+.material-icons-outlined.icon-border {
+  font-variation-settings:
+    'FILL' 0;
+}
+
 @media screen and (max-width: 767px) {
   .h1-titulo {
     font-size: clamp(3rem, 6vw, 6rem);

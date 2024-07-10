@@ -10,6 +10,8 @@ router.get("/listas/:usuarioId", controladorListas.obtenerListas);
 router.post('/listas/:listaId/libros', controladorListas.agregarLibroALista);
 router.get('/obtener-libros/:usuarioId/:listaId', controladorListas.obtenerLibrosDeLista);
 router.delete('/listas/:usuarioId/:listaId/libros/:libroId', controladorListas.eliminarLibroDeLista);
+router.post('/:usuarioId/agregar-libro', controladorListas.handleAgregarLibroMeGusta);
+router.post('/:usuarioId/eliminar-libro', controladorListas.handleEliminarLibroMeGusta);
 
 
 module.exports = router;
