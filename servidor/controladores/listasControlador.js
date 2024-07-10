@@ -1,5 +1,5 @@
 const Usuario = require("../modelos/Usuario");
-const Libro = require('../modelos/Libro');
+const Libro = require("../modelos/Libro");
 
 const crearLista = async (peticion, respuesta) => {
   const { usuarioId } = peticion.params;
@@ -34,7 +34,6 @@ const crearLista = async (peticion, respuesta) => {
     respuesta.status(500).json({ message: "Error al crear la lista", error });
   }
 };
-
 
 const agregarLibroALista = async (peticion, respuesta) => {
   const { listaId } = peticion.params;
@@ -76,7 +75,9 @@ const agregarLibroALista = async (peticion, respuesta) => {
     respuesta.status(200).json({ lista, libro });
   } catch (error) {
     console.error("Error al agregar el libro a la lista:", error);
-    respuesta.status(500).json({ message: "Error al agregar el libro a la lista", error });
+    respuesta
+      .status(500)
+      .json({ message: "Error al agregar el libro a la lista", error });
   }
 };
 
@@ -174,9 +175,9 @@ const actualizarNombreLista = async (peticion, respuesta) => {
 const eliminarLibroDeLista = async (peticion, respuesta) => {
   const { usuarioId, listaId, libroId } = peticion.params;
 
-  console.log('ID Usuario:', usuarioId);
-  console.log('ID Lista:', listaId);
-  console.log('ID Libro:', libroId);
+  console.log("ID Usuario:", usuarioId);
+  console.log("ID Lista:", listaId);
+  console.log("ID Libro:", libroId);
 
   try {
     const usuario = await Usuario.findById(usuarioId);
@@ -209,18 +210,63 @@ const obtenerDetallesDelLibroDesdeGoogle = async (libroId) => {
     _id: libroId,
     title: data.volumeInfo.title,
     authors: data.volumeInfo.authors || [],
-    mainCategory: data.volumeInfo.categories ? data.volumeInfo.categories[0] : null,
+    mainCategory: data.volumeInfo.categories
+      ? data.volumeInfo.categories[0]
+      : null,
     averageRating: data.volumeInfo.averageRating || null,
-    image: data.volumeInfo.imageLinks ? data.volumeInfo.imageLinks.thumbnail : null,
-    description: data.volumeInfo.description || ''
+    image: data.volumeInfo.imageLinks
+      ? data.volumeInfo.imageLinks.thumbnail
+      : null,
+    description: data.volumeInfo.description || "",
   };
 };
 
+const obtenerLibrosDeLista = async (peticion, respuesta) => {
+  const { listaId, usuarioId } = peticion.params;
+
+  console.log("Lista id en controlador:", listaId);
+  console.log("Usuario id en controlador:", usuarioId);
+
+  try {
+    const usuario = await Usuario.findById(usuarioId).select("listas");
+    if (!usuario) {
+      return respuesta.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const lista = usuario.listas.id(listaId);
+
+    if (!lista) {
+      return respuesta.status(404).json({ message: "Lista no encontrada" });
+    }
+
+    console.log("Lista encontrada:", lista);
+    console.log("IDs de libros en la lista:", lista.libros);
+
+    const librosConDetalles = await Promise.all(
+      lista.libros.map(async (libroId) => {
+        let libro = await Libro.findById(libroId);
+
+        if (!libro) {
+          libro = await obtenerDetallesDelLibroDesdeGoogle(libroId);
+        }
+
+        return libro;
+      })
+    );
+
+    respuesta.status(200).json(librosConDetalles);
+  } catch (error) {
+    console.error("Error al obtener los libros de la lista:", error);
+    respuesta.status(500).json({ message: "Error al obtener los libros de la lista", error });
+  }
+};
+
 module.exports = {
-    crearLista,
-    agregarLibroALista,
-    obtenerListas,
-    eliminarLista,
-    actualizarNombreLista,
-    eliminarLibroDeLista,
-  };
+  crearLista,
+  agregarLibroALista,
+  obtenerListas,
+  eliminarLista,
+  actualizarNombreLista,
+  eliminarLibroDeLista,
+  obtenerLibrosDeLista,
+};

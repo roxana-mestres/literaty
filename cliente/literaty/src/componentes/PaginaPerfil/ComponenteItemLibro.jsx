@@ -111,7 +111,7 @@ ComponenteItemLibro.propTypes = {
   colorFondo: PropTypes.string,
   colorIcono: PropTypes.string,
   libro: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
     title: PropTypes.string,
     authors: PropTypes.arrayOf(PropTypes.string),
     mainCategory: PropTypes.string,

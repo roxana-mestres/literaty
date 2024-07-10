@@ -15,25 +15,16 @@ const iconosLibros = [
   "/src/assets/libro-5.svg",
   "/src/assets/libro-6.svg",
 ];
-const usuarioId = "668bafacde874b5e8bcbe4a3";
+
+const usuarioId = "668e5211621febe6145303b4";
 
 function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);
-  const [libros, setLibros] = useState([
-    {
-      id: "123",
-      titulo: "Crimen y Castigo",
-      autor: "Fiodor Dostoievski",
-      genero: "Ficción literaria",
-      puntuacion: "⭐⭐⭐⭐⭐",
-    },
-    // más libros
-  ]);
+  const [librosDeLista, setLibrosDeLista] = useState([]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
 
   useEffect(() => {
     const fetchListas = async () => {
-      const usuarioId = "668bafacde874b5e8bcbe4a3";
       try {
         console.log(`Fetching listas for usuarioId: ${usuarioId}`);
         const respuesta = await fetch(
@@ -64,7 +55,6 @@ function ComponenteListas() {
 
   const agregarLista = async () => {
     try {
-      const usuarioId = "668bafacde874b5e8bcbe4a3";
       const nuevoIndice = listasDeLibros.length % iconosLibros.length;
       const nuevaLista = {
         nombre: `Nueva Lista ${listasDeLibros.length + 1}`,
@@ -109,10 +99,8 @@ function ComponenteListas() {
     }
   };
 
-  const eliminarLista = async (index) => {
+  const eliminarLista = async (listaId) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta lista?")) {
-      const listaId = listasDeLibros[index]._id;
-      const usuarioId = "668bafacde874b5e8bcbe4a3";
       console.log("ID de la lista a eliminar:", listaId);
       try {
         const respuesta = await fetch(
@@ -125,7 +113,7 @@ function ComponenteListas() {
         console.log("Respuesta de la solicitud de eliminación:", respuesta);
 
         if (respuesta.ok) {
-          const nuevasListas = listasDeLibros.filter((_, i) => i !== index);
+          const nuevasListas = listasDeLibros.filter((lista) => lista._id !== listaId);
           setListasDeLibros(nuevasListas);
           setIndiceSeleccionado(null);
           console.log("Lista eliminada y estado actualizado.");
@@ -143,10 +131,10 @@ function ComponenteListas() {
     }
   };
 
-  const manejarEditarNombre = (e, index) => {
+  const manejarEditarNombre = (e, listaId) => {
     const nuevoNombre = e.target.value;
-    const nuevasListas = listasDeLibros.map((lista, i) => {
-      if (i === index) {
+    const nuevasListas = listasDeLibros.map((lista) => {
+      if (lista._id === listaId) {
         return { ...lista, nombre: nuevoNombre };
       }
       return lista;
@@ -154,14 +142,13 @@ function ComponenteListas() {
     setListasDeLibros(nuevasListas);
   };
 
-  const actualizarNombreLista = async (index) => {
-    const lista = listasDeLibros[index];
+  const actualizarNombreLista = async (listaId) => {
+    const lista = listasDeLibros.find((lista) => lista._id === listaId);
     if (lista.protegida) {
       alert("Esta lista no se puede editar");
       return;
     }
 
-    const listaId = lista._id;
     const nuevoNombre = lista.nombre;
 
     try {
@@ -186,30 +173,54 @@ function ComponenteListas() {
     }
   };
 
-  const manejarBlurNombre = (index) => {
-    const nuevasListas = listasDeLibros.map((lista, i) => {
-      if (i === index) {
+  const manejarBlurNombre = (listaId) => {
+    const nuevasListas = listasDeLibros.map((lista) => {
+      if (lista._id === listaId) {
         return { ...lista, editable: false };
       }
       return lista;
     });
     setListasDeLibros(nuevasListas);
-    actualizarNombreLista(index);
+    actualizarNombreLista(listaId);
   };
 
-  const manejarClickLista = (index) => {
-    setIndiceSeleccionado(index);
-  };
+  const manejarClickLista = async (listaId) => {
+    console.log(`ID de la lista seleccionada: ${listaId}`);
+  
+    setIndiceSeleccionado(listaId);
+    console.log(`Índice de lista seleccionado cambiado a: ${listaId}`);
+  
+    try {
+      const url = `http://localhost:3000/api/obtener-libros/${usuarioId}/${listaId}`;
+      console.log(`URL de la solicitud: ${url}`);
+  
+      const respuesta = await fetch(url);
+  
+      console.log("Respuesta del fetch:", respuesta);
+  
+      if (!respuesta.ok) {
+        console.error("Error en la respuesta del servidor:", respuesta.statusText);
+        throw new Error("Error al obtener los libros de la lista");
+      }
+  
+      const data = await respuesta.json();
+      console.log("Datos de libros obtenidos:", data);
+  
+      setLibrosDeLista(data);
+    } catch (error) {
+      console.error("Error al obtener los libros de la lista:", error);
+    }
+  };  
 
-  const manejarEditarClick = (index) => {
-    const lista = listasDeLibros[index];
+  const manejarEditarClick = (listaId) => {
+    const lista = listasDeLibros.find((lista) => lista._id === listaId);
     if (lista.protegida) {
       alert("Esta lista no se puede editar");
       return;
     }
 
-    const nuevasListas = listasDeLibros.map((lista, i) => {
-      if (i === index) {
+    const nuevasListas = listasDeLibros.map((lista) => {
+      if (lista._id === listaId) {
         return { ...lista, editable: true };
       }
       return lista;
@@ -238,18 +249,18 @@ function ComponenteListas() {
             </div>
           </div>
           <div className={listas["iconos-lista"]}>
-            {listasDeLibros.map((lista, index) => (
+            {listasDeLibros.map((lista) => (
               <div
-                key={index}
+                key={lista._id}
                 className={listas["titulo-lista"]}
-                onClick={() => manejarClickLista(index)}
+                onClick={() => manejarClickLista(lista._id)}
               >
                 <img
                   src={lista.icono}
                   alt="icono libro"
                   style={{ width: "100px", marginLeft: "20px" }}
                 />
-                {indiceSeleccionado === index &&
+                {indiceSeleccionado === lista._id &&
                   lista.nombre !== "Me gusta" && (
                     <span
                       className="material-symbols-outlined"
@@ -263,13 +274,13 @@ function ComponenteListas() {
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        eliminarLista(index);
+                        eliminarLista(lista._id);
                       }}
                     >
                       delete
                     </span>
                   )}
-                {indiceSeleccionado === index &&
+                {indiceSeleccionado === lista._id &&
                   lista.nombre !== "Me gusta" && (
                     <span
                       className="material-symbols-outlined"
@@ -283,7 +294,7 @@ function ComponenteListas() {
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        manejarEditarClick(index);
+                        manejarEditarClick(lista._id);
                       }}
                     >
                       edit
@@ -293,11 +304,11 @@ function ComponenteListas() {
                   <input
                     type="text"
                     value={lista.nombre}
-                    onChange={(e) => manejarEditarNombre(e, index)}
-                    onBlur={() => manejarBlurNombre(index)}
+                    onChange={(e) => manejarEditarNombre(e, lista._id)}
+                    onBlur={() => manejarBlurNombre(lista._id)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        manejarBlurNombre(index);
+                        manejarBlurNombre(lista._id);
                       }
                     }}
                     autoFocus
@@ -323,8 +334,8 @@ function ComponenteListas() {
           Libros que me gustan
         </h1>
         <div className={principal["seccion-libros-grid"]}>
-          {libros.map((libro, index) => (
-            <div key={index} className={principal["item-libro"]}>
+          {librosDeLista.map((libro) => (
+            <div key={libro._id} className={principal["item-libro"]}>
               <ItemLibro
                 libro={libro}
                 mostrarDiv={true}
