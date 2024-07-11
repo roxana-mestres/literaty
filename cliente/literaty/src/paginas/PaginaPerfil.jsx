@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLibros } from "../contextos/contextoLibros";
+import { useListas } from "../contextos/contextoListas";
 import NombreBuscador from "../componentes/PaginaPerfil/ComponenteNombreBuscador";
 import SeccionLibros from "../componentes/PaginaPerfil/ComponenteSeccionLibros";
 import BotonSubir from "../componentes/PaginaPerfil/ComponenteBotonSubir";
@@ -11,7 +12,9 @@ import resena from "../estilos/PaginaResena.module.css";
 
 function PaginaPerfil() {
   const navegar = useNavigate();
-  const { libros, cargando, obtenerLibros, handleEliminarLibro } = useLibros();
+  const { libros, setLibros, cargando, obtenerLibros, handleEliminarLibro } =
+    useLibros();
+  const { listas, agregarLibroALista, eliminarLibroDeLista } = useListas();
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
   const [mostrarPopupListas, setMostrarPopupListas] = useState(false);
@@ -55,69 +58,47 @@ function PaginaPerfil() {
   };
 
   const handleHeartClick = async (libroId) => {
-    const usuarioId = "668e5211621febe6145303b4";
-    const listaMeGusta = listasDeLibros.find(
-      (lista) => lista.nombre === "Me gusta"
-    );
-  
-    if (!listaMeGusta) {
-      console.error("No se encontró la lista 'Me gusta'");
+    if (!libroId) {
+      alert("El libro no tiene un ID válido.");
       return;
     }
   
-    try {
-      let respuesta;
-      if (librosFavoritos.includes(libroId)) {
-        respuesta = await fetch(
-          `http://localhost:3000/api/${usuarioId}/eliminar-libro`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              listaId: listaMeGusta._id,
-              libroId: libroId,
-            }),
-          }
+    setTimeout(async () => {
+      let mensaje = "";
+      try {
+        const listaMeGusta = listas.find(
+          (lista) => lista.nombre === "Me gusta"
         );
   
-        if (!respuesta.ok) {
-          throw new Error("Error al eliminar el libro de la lista 'Me gusta'");
+        if (!listaMeGusta) {
+          console.error("No se encontró la lista 'Me gusta'");
+          alert("No se encontró la lista 'Me gusta'");
+          return;
         }
   
-        setLibrosFavoritos(librosFavoritos.filter((id) => id !== libroId));
-        alert("Se ha eliminado el libro de la lista 'Me gusta'");
-      } else {
-        respuesta = await fetch(
-          `http://localhost:3000/api/${usuarioId}/agregar-libro`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              listaId: listaMeGusta._id,
-              libroId: libroId,
-            }),
-          }
-        );
+        console.log("ID del libro seleccionado:", libroId);
   
-        if (!respuesta.ok) {
-          throw new Error("Error al guardar el libro en la lista 'Me gusta'");
+        const libroEnLista = listaMeGusta.libros.includes(libroId);
+  
+        if (!libroEnLista) {
+          await agregarLibroALista(listaMeGusta._id, { id: libroId }, libroId);
+          mensaje =
+            "El libro ha sido agregado correctamente a la lista 'Me gusta'.";
+        } else {
+          await eliminarLibroDeLista(listaMeGusta._id, libroId);
+          mensaje =
+            "El libro ha sido eliminado correctamente de la lista 'Me gusta'.";
         }
   
-        setLibrosFavoritos([...librosFavoritos, libroId]);
-        alert("Se ha agregado el libro a la lista 'Me gusta'");
+        if (mensaje) {
+          alert(mensaje);
+        }
+      } catch (error) {
+        console.error("Error al guardar en listas:", error);
+        alert("Hubo un error al intentar guardar el libro en las listas.");
       }
-    } catch (error) {
-      console.error(
-        "Error al gestionar el libro en la lista 'Me gusta':",
-        error
-      );
-      alert("Hubo un problema al actualizar la lista 'Me gusta'");
-    }
-  };
+    }, 0);
+  };  
 
   const handleBusqueda = async (termino) => {
     try {
@@ -181,7 +162,7 @@ function PaginaPerfil() {
           librosGoogleBooks={libros}
           onEliminarLibro={handleEliminarLibro}
           onBookmarkClick={abrirPopupLista}
-          handleHeartClick={handleHeartClick}
+          handleHeartClick={(libro) => handleHeartClick(libro)}
           librosFavoritos={librosFavoritos}
         />
       )}

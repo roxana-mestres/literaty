@@ -34,7 +34,8 @@ export const ListasProvider = ({ children }) => {
     setCargandoListas(false);
   };
 
-  const agregarLibroALista = async (listaId, libro) => {
+  const agregarLibroALista = async (listaId, libro, libroId) => {
+    console.log("Agregar libro a lista:", { listaId, libro });
     try {
       const respuesta = await fetch(
         `http://localhost:3000/api/listas/${listaId}/libros`,
@@ -46,6 +47,7 @@ export const ListasProvider = ({ children }) => {
           body: JSON.stringify({
             usuarioId: "668e5211621febe6145303b4",
             libroId: libro.id,
+            libroIdMeGusta: libroId
           }),
         }
       );

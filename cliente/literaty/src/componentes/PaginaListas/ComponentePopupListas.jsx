@@ -6,7 +6,7 @@ import { useListas } from "../../contextos/contextoListas";
 function ComponentePopupListas({ libro, onClose }) {
   const { listas, agregarLibroALista, eliminarLibroDeLista, cargandoListas } = useListas();
   const [listasSeleccionadas, setListasSeleccionadas] = useState([]);
-  const [cambiado, setCambiado] = useState(false); // Para rastrear si la selección cambió
+  const [cambiado, setCambiado] = useState(false);
 
   useEffect(() => {
     if (!cargandoListas) {
@@ -20,33 +20,26 @@ function ComponentePopupListas({ libro, onClose }) {
   const handleCambioCheckbox = (listaId) => {
     setListasSeleccionadas((prev) => {
       if (prev.includes(listaId)) {
-        // Si la lista ya está seleccionada, la desmarcamos
         return prev.filter((id) => id !== listaId);
       } else {
-        // Si la lista no está seleccionada, la marcamos
         return [...prev, listaId];
       }
     });
-    setCambiado(true); // Marcamos que hubo un cambio
+    setCambiado(true);
   };
 
   const handleGuardarEnListas = async () => {
-    // Cerrar el popup inmediatamente
     onClose();
 
-    // Realizar operaciones de guardado en segundo plano
     setTimeout(async () => {
       let mensaje = '';
       try {
-        // Obtenemos las listas a eliminar
         const listasParaEliminar = listas
           .filter((lista) => !listasSeleccionadas.includes(lista._id) && lista.libros.includes(libro.id))
           .map((lista) => lista._id);
 
-        // Obtenemos las listas a agregar
         const listasParaAgregar = listasSeleccionadas.filter((id) => !listas.find((lista) => lista._id === id).libros.includes(libro.id));
 
-        // Eliminamos el libro de las listas seleccionadas que ya no están en la lista de selección
         for (const listaId of listasParaEliminar) {
           await eliminarLibroDeLista(listaId, libro.id);
         }
