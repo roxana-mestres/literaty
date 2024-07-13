@@ -7,6 +7,7 @@ import listas from "../../estilos/estilosListas.module.css";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 import ItemLibro from "../PaginaPerfil/ComponenteItemLibro";
 import BotonSubir from "../../componentes/PaginaPerfil/ComponenteBotonSubir";
+import PopupListas from "../../componentes/PaginaListas/ComponentePopupListas";
 
 const iconosLibros = [
   "/src/assets/libro-1.svg",

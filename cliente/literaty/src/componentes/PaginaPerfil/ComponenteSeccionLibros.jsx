@@ -1,30 +1,34 @@
 import { useListas } from "../../contextos/contextoListas";
 import PropTypes from "prop-types";
 import ComponenteItemLibro from "./ComponenteItemLibro";
+import ComponentePopupListas from "../../componentes/PaginaListas/ComponentePopupListas";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 
-function ComponenteSeccionLibros({
-  librosGoogleBooks,
-  onEliminarLibro,
-  onBookmarkClick,
-  handleHeartClick,
-}) {
-  const { librosFavoritos } = useListas();
-  console.log("librosFavoritos en ComponenteSeccionLibros:", librosFavoritos);
-  console.log("libros google book:", librosGoogleBooks);
+function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro }) {
+  const {
+    abrirPopupLista,
+    cerrarPopupLista,
+    popupVisible,
+    libroSeleccionado,
+    librosFavoritos,
+    handleHeartClick,
+  } = useListas();
   const librosConImagen = librosGoogleBooks.filter((libro) => {
     const volumeInfo = libro.volumeInfo || {};
 
     return volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail;
   });
 
+  const handleBookmarkClick = (libro) => {
+    abrirPopupLista(libro);
+  };
+
   return (
     <div className={principal["seccion-libros-grid"]}>
-      {librosConImagen.map((libro, index) => {
-        console.log("Pasando context:", "perfil");
+      {librosConImagen.map((libro) => {
         const volumeInfo = libro.volumeInfo || {};
         return (
-          <div key={`${libro.id}`} className={`${principal["item-libro"]}`}>
+          <div key={`${libro.id}`} className={principal["item-libro"]}>
             <ComponenteItemLibro
               libro={{
                 id: libro.id || "",
@@ -41,15 +45,18 @@ function ComponenteSeccionLibros({
               }}
               mostrarDiv={true}
               onEliminar={onEliminarLibro}
-              onBookmarkClick={onBookmarkClick}
               handleHeartClick={handleHeartClick}
+              onClick={() => handleBookmarkClick(libro)}
               favoritos={librosFavoritos}
               context="perfil"
             />
           </div>
         );
       })}
-      
+
+      {popupVisible && libroSeleccionado && (
+        <ComponentePopupListas libro={libroSeleccionado} onClose={cerrarPopupLista} />
+      )}
     </div>
   );
 }
@@ -71,8 +78,6 @@ ComponenteSeccionLibros.propTypes = {
     })
   ).isRequired,
   onEliminarLibro: PropTypes.func.isRequired,
-  onBookmarkClick: PropTypes.func.isRequired,
-  handleHeartClick: PropTypes.func.isRequired,
 };
 
 export default ComponenteSeccionLibros;

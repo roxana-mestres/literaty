@@ -12,11 +12,11 @@ function ComponenteItemLibro({
   onBookmarkClick,
   favoritos,
   handleHeartClick,
+  onClick,
   context,
   ...props
 }) {
   const navegar = useNavigate();
-  console.log("Contexto final en ComponenteItemLibro:", context);
 
   function obtenerIdLibro(libro) {
     return libro._id || libro.id;
@@ -24,9 +24,6 @@ function ComponenteItemLibro({
 
   const esFavoritos =
     Array.isArray(favoritos) && favoritos.includes(obtenerIdLibro(libro));
-
-  console.log("Contexto itemLibros:", context);
-  console.log("Es Favoritos:", esFavoritos);
 
   const estiloTextoTitulo = {
     color: props.colorTextoTitulo,
@@ -71,8 +68,8 @@ function ComponenteItemLibro({
 
   const handleBookmarkClick = (e) => {
     e.stopPropagation();
-    if (onBookmarkClick) {
-      onBookmarkClick(libro);
+    if (onClick) {
+      onClick(libro);
     }
   };
 
