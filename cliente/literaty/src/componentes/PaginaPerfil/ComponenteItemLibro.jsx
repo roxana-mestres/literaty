@@ -1,6 +1,10 @@
-import principal from "../../estilos/PaginaPrincipal.module.css";
-import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import principal from "../../estilos/PaginaPrincipal.module.css";
+import heartFillBlack from "../../assets/heart-fill-black.svg";
+import heartBorderBlack from "../../assets/heart-border-black.svg";
+import heartFillLight from "../../assets/heart-fill-light.svg";
+import heartBorderLight from "../../assets/heart-border-light.svg";
 
 function ComponenteItemLibro({
   libro,
@@ -8,9 +12,20 @@ function ComponenteItemLibro({
   onBookmarkClick,
   favoritos,
   handleHeartClick,
+  context,
   ...props
 }) {
   const navegar = useNavigate();
+  console.log("Contexto final en ComponenteItemLibro:", context);
+  function obtenerIdLibro(libro) {
+    return libro._id || libro.id;
+  }
+
+  const esFavoritos =
+    Array.isArray(favoritos) && favoritos.includes(obtenerIdLibro(libro));
+
+  console.log("Contexto itemLibros:", context);
+  console.log("Es Favoritos:", esFavoritos);
 
   const estiloTextoTitulo = {
     color: props.colorTextoTitulo,
@@ -23,7 +38,11 @@ function ComponenteItemLibro({
 
   const estiloIcono = {
     color: props.colorIcono,
-    fontSize: "35px",
+    fontSize: "24px",
+  };
+
+  const estiloTextoAutor = {
+    color: props.colorIcono,
   };
 
   const autores = Array.isArray(libro?.authors) ? libro.authors.join(", ") : "";
@@ -61,6 +80,15 @@ function ComponenteItemLibro({
     handleHeartClick(libro.id);
   };
 
+  const iconoCorazon =
+    context === "perfil"
+      ? esFavoritos
+        ? heartFillBlack
+        : heartBorderBlack
+      : esFavoritos
+      ? heartFillLight
+      : heartBorderLight;
+
   return (
     <div className={`${principal["div-libro-notas"]} ${props.className}`}>
       <div
@@ -73,7 +101,7 @@ function ComponenteItemLibro({
       ></div>
       <div className={principal["datos-libro-notas"]}>
         <p style={estiloTextoTitulo}>{tituloCortado}</p>
-        <p>{autoresCortados}</p>
+        <p style={estiloTextoAutor}>{autoresCortados}</p>
         <p className={principal["genero-libro-notas"]} style={estiloGenero}>
           {libro.mainCategory}
         </p>
@@ -89,25 +117,23 @@ function ComponenteItemLibro({
       </div>
       {props.mostrarDiv && (
         <div className={principal["iconos-libros-notas"]}>
-          <span
-            className={`material-symbols-outlined ${
-              favoritos ? "icon-favorite" : "icon-border"
-            }`}
-            style={{ fontSize: "24px", cursor: "pointer" }}
+          <img
+            src={iconoCorazon}
+            alt="favorite icon"
+            style={{ ...estiloIcono, fontSize: "5px", cursor: "pointer" }}
             onClick={handleClickCorazon}
-          >
-            {favoritos ? "favorite" : "favorite_border"}
-          </span>
+            className={principal["icono-corazon"]}
+          />
           <span
             className="material-symbols-outlined"
-            style={{ estiloIcono, cursor: "pointer" }}
+            style={{ ...estiloIcono, cursor: "pointer" }}
             onClick={handleBookmarkClick}
           >
             bookmark
           </span>
           <span
             className="material-symbols-outlined"
-            style={{ estiloIcono, cursor: "pointer" }}
+            style={{ ...estiloIcono, cursor: "pointer" }}
             onClick={handleEliminar}
           >
             delete
@@ -134,8 +160,10 @@ ComponenteItemLibro.propTypes = {
     image: PropTypes.string,
     description: PropTypes.string,
   }).isRequired,
+  favoritos: PropTypes.arrayOf(PropTypes.string),
   onEliminar: PropTypes.func.isRequired,
   onBookmarkClick: PropTypes.func.isRequired,
+  context: PropTypes.oneOf(["perfil", "listas"]).isRequired,
 };
 
 export default ComponenteItemLibro;

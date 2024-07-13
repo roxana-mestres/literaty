@@ -166,6 +166,10 @@ p {
 .item-lista input[type="checkbox"] {
   margin-right: 10px;
 }
+
+.icono-corazon{
+ width: 24px;
+}
 /*FOOTER*/
 div.footer {
   position: fixed;

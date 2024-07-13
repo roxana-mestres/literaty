@@ -7,11 +7,20 @@ export const useListas = () => useContext(ListasContexto);
 export const ListasProvider = ({ children }) => {
   const [listas, setListas] = useState([]);
   const [cargandoListas, setCargandoListas] = useState(false);
-  const usuarioId = "668e5211621febe6145303b4";
+  const [librosFavoritos, setLibrosFavoritos] = useState([]);
+
 
   useEffect(() => {
     obtenerListas();
   }, []);
+
+  useEffect(() => {
+    const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
+    if (listaMeGusta) {
+      setLibrosFavoritos(listaMeGusta.libros);
+      console.log("IDs de libros favoritos contextoListas:", listaMeGusta.libros);
+    }
+  }, [listas]);
 
   const obtenerListas = async () => {
     setCargandoListas(true);
@@ -118,6 +127,7 @@ export const ListasProvider = ({ children }) => {
         agregarLibroALista,
         eliminarLibroDeLista,
         eliminarLista,
+        librosFavoritos,
       }}
     >
       {children}

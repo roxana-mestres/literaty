@@ -19,7 +19,6 @@ function PaginaPerfil() {
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
   const [mostrarPopupListas, setMostrarPopupListas] = useState(false);
   const [listasDeLibros, setListasDeLibros] = useState([]);
-  const [librosFavoritos, setLibrosFavoritos] = useState([]);
 
   useEffect(() => {
     const fetchListas = async () => {
@@ -59,46 +58,36 @@ function PaginaPerfil() {
 
   const handleHeartClick = async (libroId) => {
     if (!libroId) {
-      alert("El libro no tiene un ID válido.");
-      return;
+        alert("El libro no tiene un ID válido.");
+        return;
     }
-  
+
     setTimeout(async () => {
-      let mensaje = "";
-      try {
-        const listaMeGusta = listas.find(
-          (lista) => lista.nombre === "Me gusta"
-        );
-  
-        if (!listaMeGusta) {
-          console.error("No se encontró la lista 'Me gusta'");
-          alert("No se encontró la lista 'Me gusta'");
-          return;
+        try {
+            const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
+
+            if (!listaMeGusta) {
+                console.error("No se encontró la lista 'Me gusta'");
+                alert("No se encontró la lista 'Me gusta'");
+                return;
+            }
+
+            console.log("ID del libro seleccionado:", libroId);
+
+            const libroEnLista = listaMeGusta.libros.includes(libroId);
+
+            if (!libroEnLista) {
+                await agregarLibroALista(listaMeGusta._id, { id: libroId }, libroId);
+            } else {
+                await eliminarLibroDeLista(listaMeGusta._id, libroId);
+                alert("El libro ha sido eliminado correctamente de la lista 'Me gusta'.");
+            }
+        } catch (error) {
+            console.error("Error al guardar en listas:", error);
+            alert("Hubo un error al intentar guardar el libro en las listas.");
         }
-  
-        console.log("ID del libro seleccionado:", libroId);
-  
-        const libroEnLista = listaMeGusta.libros.includes(libroId);
-  
-        if (!libroEnLista) {
-          await agregarLibroALista(listaMeGusta._id, { id: libroId }, libroId);
-          mensaje =
-            "El libro ha sido agregado correctamente a la lista 'Me gusta'.";
-        } else {
-          await eliminarLibroDeLista(listaMeGusta._id, libroId);
-          mensaje =
-            "El libro ha sido eliminado correctamente de la lista 'Me gusta'.";
-        }
-  
-        if (mensaje) {
-          alert(mensaje);
-        }
-      } catch (error) {
-        console.error("Error al guardar en listas:", error);
-        alert("Hubo un error al intentar guardar el libro en las listas.");
-      }
     }, 0);
-  };  
+};
 
   const handleBusqueda = async (termino) => {
     try {
@@ -163,7 +152,6 @@ function PaginaPerfil() {
           onEliminarLibro={handleEliminarLibro}
           onBookmarkClick={abrirPopupLista}
           handleHeartClick={(libro) => handleHeartClick(libro)}
-          librosFavoritos={librosFavoritos}
         />
       )}
       <Footer

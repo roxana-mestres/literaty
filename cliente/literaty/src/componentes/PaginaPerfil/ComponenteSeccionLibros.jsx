@@ -1,3 +1,4 @@
+import { useListas } from "../../contextos/contextoListas";
 import PropTypes from "prop-types";
 import ComponenteItemLibro from "./ComponenteItemLibro";
 import principal from "../../estilos/PaginaPrincipal.module.css";
@@ -7,8 +8,9 @@ function ComponenteSeccionLibros({
   onEliminarLibro,
   onBookmarkClick,
   handleHeartClick,
-  librosFavoritos,
 }) {
+  const { librosFavoritos } = useListas();
+  console.log("librosFavoritos en ComponenteSeccionLibros:", librosFavoritos);
   console.log("libros google book:", librosGoogleBooks);
   const librosConImagen = librosGoogleBooks.filter((libro) => {
     const volumeInfo = libro.volumeInfo || {};
@@ -19,6 +21,7 @@ function ComponenteSeccionLibros({
   return (
     <div className={principal["seccion-libros-grid"]}>
       {librosConImagen.map((libro, index) => {
+        console.log("Pasando context:", "perfil");
         const volumeInfo = libro.volumeInfo || {};
         return (
           <div key={`${libro.id}`} className={`${principal["item-libro"]}`}>
@@ -40,11 +43,13 @@ function ComponenteSeccionLibros({
               onEliminar={onEliminarLibro}
               onBookmarkClick={onBookmarkClick}
               handleHeartClick={handleHeartClick}
-              favoritos={librosFavoritos.includes(libro.id)}
+              favoritos={librosFavoritos}
+              context="perfil"
             />
           </div>
         );
       })}
+      
     </div>
   );
 }
@@ -67,6 +72,7 @@ ComponenteSeccionLibros.propTypes = {
   ).isRequired,
   onEliminarLibro: PropTypes.func.isRequired,
   onBookmarkClick: PropTypes.func.isRequired,
+  handleHeartClick: PropTypes.func.isRequired,
 };
 
 export default ComponenteSeccionLibros;

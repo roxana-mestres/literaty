@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useListas } from "../../contextos/contextoListas";
 import { Link } from "react-router-dom";
 import estilos from "../../estilos/Comunes.module.css";
 import resena from "../../estilos/PaginaResena.module.css";
@@ -22,6 +23,8 @@ function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);
   const [librosDeLista, setLibrosDeLista] = useState([]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
+  const { librosFavoritos } = useListas();
+  console.log("librosFavoritos en ComponenteListas:", librosFavoritos);
 
   useEffect(() => {
     const fetchListas = async () => {
@@ -43,6 +46,11 @@ function ComponenteListas() {
         }));
 
         setListasDeLibros(data);
+
+        const listaMeGusta = data.find(lista => lista.nombre === "Me gusta");
+        if (listaMeGusta) {
+          manejarClickLista(listaMeGusta._id);
+        }
       } catch (error) {
         console.error("Error al obtener las listas:", error);
       }
@@ -345,6 +353,8 @@ function ComponenteListas() {
                 colorTextoGenero="#252627"
                 colorFondo="#f4e5e0"
                 colorIcono="#f4e5e0"
+                favoritos={librosFavoritos}
+                context="listas"
               />
             </div>
           ))}
