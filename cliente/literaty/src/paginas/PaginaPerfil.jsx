@@ -14,7 +14,7 @@ function PaginaPerfil() {
   const navegar = useNavigate();
   const { libros, setLibros, cargando, obtenerLibros, handleEliminarLibro } =
     useLibros();
-  const { listas, agregarLibroALista, eliminarLibroDeLista } = useListas();
+  const { listas, agregarLibroALista, eliminarLibroDeLista, handleHeartClick} = useListas();
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
   const [mostrarPopupListas, setMostrarPopupListas] = useState(false);
@@ -55,39 +55,6 @@ function PaginaPerfil() {
     setMostrarPopup(false);
     navegar(ruta);
   };
-
-  const handleHeartClick = async (libroId) => {
-    if (!libroId) {
-        alert("El libro no tiene un ID válido.");
-        return;
-    }
-
-    setTimeout(async () => {
-        try {
-            const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
-
-            if (!listaMeGusta) {
-                console.error("No se encontró la lista 'Me gusta'");
-                alert("No se encontró la lista 'Me gusta'");
-                return;
-            }
-
-            console.log("ID del libro seleccionado:", libroId);
-
-            const libroEnLista = listaMeGusta.libros.includes(libroId);
-
-            if (!libroEnLista) {
-                await agregarLibroALista(listaMeGusta._id, { id: libroId }, libroId);
-            } else {
-                await eliminarLibroDeLista(listaMeGusta._id, libroId);
-                alert("El libro ha sido eliminado correctamente de la lista 'Me gusta'.");
-            }
-        } catch (error) {
-            console.error("Error al guardar en listas:", error);
-            alert("Hubo un error al intentar guardar el libro en las listas.");
-        }
-    }, 0);
-};
 
   const handleBusqueda = async (termino) => {
     try {

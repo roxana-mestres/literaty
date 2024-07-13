@@ -23,7 +23,7 @@ function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);
   const [librosDeLista, setLibrosDeLista] = useState([]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
-  const { librosFavoritos } = useListas();
+  const { librosFavoritos, handleHeartClick } = useListas();
   console.log("librosFavoritos en ComponenteListas:", librosFavoritos);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ function ComponenteListas() {
     if (usuarioId) {
       fetchListas();
     }
-  }, [usuarioId]);
+  }, [usuarioId, librosFavoritos]);
 
   const agregarLista = async () => {
     try {
@@ -355,6 +355,7 @@ function ComponenteListas() {
                 colorIcono="#f4e5e0"
                 favoritos={librosFavoritos}
                 context="listas"
+                handleHeartClick={handleHeartClick}
               />
             </div>
           ))}

@@ -17,6 +17,7 @@ function ComponenteItemLibro({
 }) {
   const navegar = useNavigate();
   console.log("Contexto final en ComponenteItemLibro:", context);
+
   function obtenerIdLibro(libro) {
     return libro._id || libro.id;
   }
@@ -76,9 +77,10 @@ function ComponenteItemLibro({
   };
 
   const handleClickCorazon = (e) => {
-    e.stopPropagation();
-    handleHeartClick(libro.id);
-  };
+  e.stopPropagation();
+  const libroId = obtenerIdLibro(libro);
+  handleHeartClick(libroId);
+};
 
   const iconoCorazon =
     context === "perfil"

@@ -9,7 +9,6 @@ export const ListasProvider = ({ children }) => {
   const [cargandoListas, setCargandoListas] = useState(false);
   const [librosFavoritos, setLibrosFavoritos] = useState([]);
 
-
   useEffect(() => {
     obtenerListas();
   }, []);
@@ -18,7 +17,10 @@ export const ListasProvider = ({ children }) => {
     const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
     if (listaMeGusta) {
       setLibrosFavoritos(listaMeGusta.libros);
-      console.log("IDs de libros favoritos contextoListas:", listaMeGusta.libros);
+      console.log(
+        "IDs de libros favoritos contextoListas:",
+        listaMeGusta.libros
+      );
     }
   }, [listas]);
 
@@ -56,7 +58,7 @@ export const ListasProvider = ({ children }) => {
           body: JSON.stringify({
             usuarioId: "668e5211621febe6145303b4",
             libroId: libro.id,
-            libroIdMeGusta: libroId
+            libroIdMeGusta: libroId,
           }),
         }
       );
@@ -118,6 +120,43 @@ export const ListasProvider = ({ children }) => {
       console.error("Error al eliminar la lista:", error);
     }
   };
+  const handleHeartClick = async (libroId) => {
+    if (!libroId) {
+      console.log("libroId en contextoListas", libroId);
+      alert("El libro no tiene un ID válido.");
+      return;
+    }
+
+    setTimeout(async () => {
+      try {
+        const listaMeGusta = listas.find(
+          (lista) => lista.nombre === "Me gusta"
+        );
+
+        if (!listaMeGusta) {
+          console.error("No se encontró la lista 'Me gusta'");
+          alert("No se encontró la lista 'Me gusta'");
+          return;
+        }
+
+        console.log("ID del libro seleccionado:", libroId);
+
+        const libroEnLista = listaMeGusta.libros.includes(libroId);
+
+        if (!libroEnLista) {
+          await agregarLibroALista(listaMeGusta._id, { id: libroId }, libroId);
+        } else {
+          await eliminarLibroDeLista(listaMeGusta._id, libroId);
+          alert(
+            "El libro ha sido eliminado correctamente de la lista 'Me gusta'."
+          );
+        }
+      } catch (error) {
+        console.error("Error al guardar en listas:", error);
+        alert("Hubo un error al intentar guardar el libro en las listas.");
+      }
+    }, 0);
+  };
 
   return (
     <ListasContexto.Provider
@@ -128,6 +167,7 @@ export const ListasProvider = ({ children }) => {
         eliminarLibroDeLista,
         eliminarLista,
         librosFavoritos,
+        handleHeartClick,
       }}
     >
       {children}
