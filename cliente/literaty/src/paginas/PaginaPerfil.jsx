@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLibros } from "../contextos/contextoLibros";
 import { useListas } from "../contextos/contextoListas";
@@ -12,15 +12,12 @@ import resena from "../estilos/PaginaResena.module.css";
 
 function PaginaPerfil() {
   const navegar = useNavigate();
-  const { libros, setLibros, cargando, obtenerLibros, handleEliminarLibro } =
+  const { libros, setLibros, cargando, obtenerLibros } =
     useLibros();
   const {
-    handleHeartClick,
-    abrirPopupLista,
     cerrarPopupLista,
     libroSeleccionado,
     listasDeLibros,
-    popupVisible,
     mostrarPopupListas,
   } = useListas();
   const [mostrarPopup, setMostrarPopup] = useState(false);
@@ -90,9 +87,6 @@ function PaginaPerfil() {
       ) : (
         <SeccionLibros
           librosGoogleBooks={libros}
-          onEliminarLibro={handleEliminarLibro}
-          onBookmarkClick={abrirPopupLista}
-          handleHeartClick={(libro) => handleHeartClick(libro)}
         />
       )}
       <Footer

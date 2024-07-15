@@ -12,19 +12,29 @@ export const ListasProvider = ({ children }) => {
   const [listasSeleccionadas, setListasSeleccionadas] = useState([]);
   const [cargandoListas, setCargandoListas] = useState(false);
   const [librosFavoritos, setLibrosFavoritos] = useState([]);
+  const [librosGuardados, setLibrosGuardados] = useState([]);
 
   useEffect(() => {
+    console.log("useEffect para obtener listas ejecutado");
     obtenerListas();
   }, []);
 
   useEffect(() => {
-    const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
-    if (listaMeGusta) {
-      setLibrosFavoritos(listaMeGusta.libros);
-      console.log(
-        "IDs de libros favoritos contextoListas:",
-        listaMeGusta.libros
-      );
+    console.log("useEffect para actualizar libros ejecutado");
+    if (listas.length > 0) {
+      console.log("Listas disponibles:", listas);
+      const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
+      if (listaMeGusta) {
+        console.log("Lista 'Me gusta' encontrada:", listaMeGusta);
+        setLibrosFavoritos(listaMeGusta.libros);
+      }
+
+      const librosEnGuardados = listas
+        .filter((lista) => lista.nombre !== "Me gusta")
+        .flatMap((lista) => lista.libros);
+
+      setLibrosGuardados(librosEnGuardados);
+      console.log("Libros guardados en useEffect:", librosEnGuardados);
     }
   }, [listas]);
 
@@ -42,7 +52,24 @@ export const ListasProvider = ({ children }) => {
         }
       );
       const data = await respuesta.json();
+      console.log("Listas obtenidas:", data);
       setListas(data);
+
+      const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
+      if (listaMeGusta) {
+        setLibrosFavoritos(listaMeGusta.libros);
+      }
+
+      const librosEnGuardados = data
+        .filter((lista) => lista.nombre !== "Me gusta")
+        .flatMap((lista) => lista.libros);
+
+      setLibrosGuardados(librosEnGuardados);
+
+      console.log(
+        "Libros guardados después de obtener listas:",
+        librosEnGuardados
+      );
     } catch (error) {
       console.error("Error al obtener listas:", error);
     }
@@ -62,15 +89,12 @@ export const ListasProvider = ({ children }) => {
           body: JSON.stringify({
             usuarioId: "668e5211621febe6145303b4",
             libroId: libro.id,
-            libroIdMeGusta: libroId,
           }),
         }
       );
       if (respuesta.ok) {
-        const data = await respuesta.json();
-        console.log(data);
         await obtenerListas();
-        
+        console.log("Libro agregado a la lista contextoListas:", libroId);
       } else {
         console.error(
           "Error al agregar libro a la lista:",
@@ -124,80 +148,63 @@ export const ListasProvider = ({ children }) => {
       console.error("Error al eliminar la lista:", error);
     }
   };
-  
+
   const handleHeartClick = async (libroId) => {
+    console.log("handleHeartClick llamado con ID:", libroId);
+
     if (!libroId) {
-      console.log("libroId en contextoListas", libroId);
+      console.log("ID del libro es inválido");
       alert("El libro no tiene un ID válido.");
       return;
     }
-  
+
+    console.log("ID del libro seleccionado:", libroId);
+
     try {
       const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
-  
+
       if (!listaMeGusta) {
         console.error("No se encontró la lista 'Me gusta'");
         alert("No se encontró la lista 'Me gusta'");
         return;
       }
-  
-      console.log("ID del libro seleccionado:", libroId);
-  
+
+      console.log("ID del libro en 'Me gusta':", libroId);
+
       const libroEnLista = listaMeGusta.libros.includes(libroId);
-  
+      console.log("El libro está en la lista 'Me gusta':", libroEnLista);
+
       if (!libroEnLista) {
         await agregarLibroALista(listaMeGusta._id, { id: libroId }, libroId);
         alert("El libro ha sido añadido correctamente a la lista 'Me gusta'.");
+        setLibrosFavoritos((prev) => [...prev, libroId]);
       } else {
         await eliminarLibroDeLista(listaMeGusta._id, libroId);
-        alert("El libro ha sido eliminado correctamente de la lista 'Me gusta'.");
+        alert(
+          "El libro ha sido eliminado correctamente de la lista 'Me gusta'."
+        );
+        setLibrosFavoritos((prev) => prev.filter((id) => id !== libroId));
       }
     } catch (error) {
       console.error("Error al guardar en listas:", error);
       alert("Hubo un error al intentar guardar el libro en las listas.");
     }
-  };  
+  };
 
   const abrirPopupLista = (libro) => {
     setLibroSeleccionado(libro);
     setPopupVisible(true);
+
+    const listasQueContienenElLibro = listas
+      .filter((lista) => lista.libros.includes(libro.id))
+      .map((lista) => lista._id);
+
+    setListasSeleccionadas(listasQueContienenElLibro);
   };
 
   const cerrarPopupLista = () => {
     setPopupVisible(false);
     setLibroSeleccionado(null);
-  };
-
-  const handleBookmarkClick = async (libroId) => {
-    if (!libroId) {
-      console.log("libroId en contextoListas", libroId);
-      alert("El libro no tiene un ID válido.");
-      return;
-    }
-
-    try {
-      const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
-
-      if (!listaMeGusta) {
-        console.error("No se encontró la lista 'Me gusta'");
-        alert("No se encontró la lista 'Me gusta'");
-        return;
-      }
-
-      console.log("ID del libro seleccionado:", libroId);
-
-      const libroEnLista = listaMeGusta.libros.includes(libroId);
-
-      if (!libroEnLista) {
-        await agregarLibroALista(listaMeGusta._id, { id: libroId });
-      } else {
-        await eliminarLibroDeLista(listaMeGusta._id, libroId);
-       
-      }
-    } catch (error) {
-      console.error("Error al guardar en listas:", error);
-      alert("Hubo un error al intentar guardar el libro en las listas.");
-    }
   };
 
   const handleCambioCheckbox = (listaId) => {
@@ -213,36 +220,42 @@ export const ListasProvider = ({ children }) => {
 
   const handleGuardarEnListas = async () => {
     if (!libroSeleccionado) return;
-  
+
     const listasParaEliminar = listas
-      .filter((lista) => !listasSeleccionadas.includes(lista._id) && lista.libros.includes(libroSeleccionado.id))
+      .filter(
+        (lista) =>
+          !listasSeleccionadas.includes(lista._id) &&
+          lista.libros.includes(libroSeleccionado.id)
+      )
       .map((lista) => lista._id);
-  
-    const listasParaAgregar = listasSeleccionadas.filter((id) => !listas.find((lista) => lista._id === id).libros.includes(libroSeleccionado.id));
-  
-    let mensaje = '';
-  
+
+    const listasParaAgregar = listasSeleccionadas.filter(
+      (id) =>
+        !listas
+          .find((lista) => lista._id === id)
+          .libros.includes(libroSeleccionado.id)
+    );
+
+    let mensaje = "";
+
     try {
-      // Eliminar libro de listas que ya no están seleccionadas
       for (const listaId of listasParaEliminar) {
         await eliminarLibroDeLista(listaId, libroSeleccionado.id);
       }
-  
-      // Agregar libro a listas nuevas
       for (const listaId of listasParaAgregar) {
         await agregarLibroALista(listaId, libroSeleccionado);
       }
-  
-      // Construir el mensaje de alerta
+
+      await obtenerListas();
       if (listasParaEliminar.length > 0) {
         mensaje += "El libro ha sido eliminado correctamente de las listas.";
       }
-  
+
       if (listasParaAgregar.length > 0) {
         if (mensaje) mensaje += " ";
         mensaje += "El libro ha sido añadido correctamente a las listas.";
       }
-  
+
       return mensaje || "No se realizaron cambios.";
     } catch (error) {
       console.error("Error al guardar en listas:", error);
@@ -266,7 +279,6 @@ export const ListasProvider = ({ children }) => {
         handleHeartClick,
         abrirPopupLista,
         cerrarPopupLista,
-        handleBookmarkClick,
         handleCambioCheckbox,
         handleGuardarEnListas,
       }}

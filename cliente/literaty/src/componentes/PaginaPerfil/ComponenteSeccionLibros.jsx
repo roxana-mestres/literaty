@@ -4,24 +4,16 @@ import ComponenteItemLibro from "./ComponenteItemLibro";
 import ComponentePopupListas from "../../componentes/PaginaListas/ComponentePopupListas";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 
-function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro }) {
+function ComponenteSeccionLibros({ librosGoogleBooks }) {
   const {
-    abrirPopupLista,
     cerrarPopupLista,
     popupVisible,
     libroSeleccionado,
-    librosFavoritos,
-    handleHeartClick,
   } = useListas();
   const librosConImagen = librosGoogleBooks.filter((libro) => {
     const volumeInfo = libro.volumeInfo || {};
-
     return volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail;
   });
-
-  const handleBookmarkClick = (libro) => {
-    abrirPopupLista(libro);
-  };
 
   return (
     <div className={principal["seccion-libros-grid"]}>
@@ -44,10 +36,6 @@ function ComponenteSeccionLibros({ librosGoogleBooks, onEliminarLibro }) {
                   : "",
               }}
               mostrarDiv={true}
-              onEliminar={onEliminarLibro}
-              handleHeartClick={handleHeartClick}
-              onClick={() => handleBookmarkClick(libro)}
-              favoritos={librosFavoritos}
               context="perfil"
             />
           </div>
@@ -77,7 +65,6 @@ ComponenteSeccionLibros.propTypes = {
       }),
     })
   ).isRequired,
-  onEliminarLibro: PropTypes.func.isRequired,
 };
 
 export default ComponenteSeccionLibros;
