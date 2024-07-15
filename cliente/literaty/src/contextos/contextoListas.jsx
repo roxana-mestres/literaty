@@ -34,7 +34,7 @@ export const ListasProvider = ({ children }) => {
         .flatMap((lista) => lista.libros);
 
       setLibrosGuardados(librosEnGuardados);
-      console.log("Libros guardados en useEffect:", librosEnGuardados);
+      console.log("Libros guardados en useEffect:", librosGuardados);
     }
   }, [listas]);
 
@@ -247,6 +247,7 @@ export const ListasProvider = ({ children }) => {
       }
 
       await obtenerListas();
+      console.log("Libros guardados después de obtener listas:", librosGuardados);
       if (listasParaEliminar.length > 0) {
         mensaje += "El libro ha sido eliminado correctamente de las listas.";
       }
@@ -272,6 +273,7 @@ export const ListasProvider = ({ children }) => {
         eliminarLibroDeLista,
         eliminarLista,
         librosFavoritos,
+        librosGuardados,
         popupVisible,
         libroSeleccionado,
         listasSeleccionadas,

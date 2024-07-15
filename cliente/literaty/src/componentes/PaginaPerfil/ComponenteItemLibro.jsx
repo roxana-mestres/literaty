@@ -23,10 +23,14 @@ function ComponenteItemLibro({ libro, context, ...props }) {
   } = useListas();
 
   const obtenerIdLibro = (libro) => libro._id || libro.id;
-
   const libroId = obtenerIdLibro(libro);
+
   const esFavorito = Array.isArray(librosFavoritos) && librosFavoritos.includes(libroId);
   const estaGuardado = Array.isArray(librosGuardados) && librosGuardados.includes(libroId);
+  console.log("estaGuardado en perfil:", estaGuardado);
+  console.log("context en perfil:", context);
+  console.log("ID del libro itemLibro:", libroId);
+  console.log("Libros guardados en itemLibro:", librosGuardados);
 
   const estiloTextoTitulo = { color: props.colorTextoTitulo };
   const estiloGenero = { color: props.colorTextoGenero, backgroundColor: props.colorFondo };
