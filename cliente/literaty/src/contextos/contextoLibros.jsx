@@ -51,10 +51,10 @@ export const LibrosProvider = ({ children }) => {
     setCargando(false);
   };
 
-  const handleEliminarLibro = async (id) => {
+  const handleEliminarLibro = async (libroId) => {
     const emailUsuario = "roxana.mestres@hotmail.com";
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/libros/${id}`, {
+      const respuesta = await fetch(`http://localhost:3000/api/libros/${libroId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const LibrosProvider = ({ children }) => {
 
       if (respuesta.ok) {
         setLibros((prevLibros) =>
-          prevLibros.filter((libro) => libro.id !== id)
+          prevLibros.filter((libro) => libro.id !== libroId)
         );
       } else {
         console.error("Error al eliminar libro");

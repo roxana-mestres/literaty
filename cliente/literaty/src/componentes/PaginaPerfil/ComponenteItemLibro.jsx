@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useListas } from "../../contextos/contextoListas";
+import { useLibros } from "../../contextos/contextoLibros";
 import PropTypes from "prop-types";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 import heartFillBlack from "../../assets/heart-fill-black.svg";
@@ -13,8 +14,8 @@ import bookmarkBorderLight from "../../assets/bookmarkBorderLight.svg";
 
 function ComponenteItemLibro({ libro, context, ...props }) {
   const navegar = useNavigate();
+  const {handleEliminarLibro} = useLibros();
   const {
-    eliminarLibroDeLista,
     librosFavoritos,
     librosGuardados,
     handleHeartClick,
@@ -43,7 +44,7 @@ function ComponenteItemLibro({ libro, context, ...props }) {
 
   const handleEliminarLocal = () => {
     if (libroId) {
-      eliminarLibroDeLista(libroId);
+      handleEliminarLibro(libroId);
     }
   };
 
