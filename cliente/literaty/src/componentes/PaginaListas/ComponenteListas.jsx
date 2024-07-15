@@ -7,7 +7,7 @@ import listas from "../../estilos/estilosListas.module.css";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 import ItemLibro from "../PaginaPerfil/ComponenteItemLibro";
 import BotonSubir from "../../componentes/PaginaPerfil/ComponenteBotonSubir";
-import PopupListas from "../../componentes/PaginaListas/ComponentePopupListas";
+import ComponentePopupListas from "../../componentes/PaginaListas/ComponentePopupListas";
 
 const iconosLibros = [
   "/src/assets/libro-1.svg",
@@ -24,8 +24,12 @@ function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);
   const [librosDeLista, setLibrosDeLista] = useState([]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
-  const { librosFavoritos, handleHeartClick } = useListas();
-  console.log("librosFavoritos en ComponenteListas:", librosFavoritos);
+  const {
+    librosFavoritos,
+    popupVisible,
+    cerrarPopupLista,
+    libroSeleccionado,
+  } = useListas();
 
   useEffect(() => {
     const fetchListas = async () => {
@@ -39,7 +43,7 @@ function ComponenteListas() {
           throw new Error("Error al obtener las listas");
         }
         let data = await respuesta.json();
-        console.log("Datos obtenidos:", data);
+        console.log("Listas obtenidas:", data);
 
         data = data.map((lista, index) => ({
           ...lista,
@@ -48,7 +52,7 @@ function ComponenteListas() {
 
         setListasDeLibros(data);
 
-        const listaMeGusta = data.find(lista => lista.nombre === "Me gusta");
+        const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
         if (listaMeGusta) {
           manejarClickLista(listaMeGusta._id);
         }
@@ -122,7 +126,9 @@ function ComponenteListas() {
         console.log("Respuesta de la solicitud de eliminación:", respuesta);
 
         if (respuesta.ok) {
-          const nuevasListas = listasDeLibros.filter((lista) => lista._id !== listaId);
+          const nuevasListas = listasDeLibros.filter(
+            (lista) => lista._id !== listaId
+          );
           setListasDeLibros(nuevasListas);
           setIndiceSeleccionado(null);
           console.log("Lista eliminada y estado actualizado.");
@@ -195,31 +201,38 @@ function ComponenteListas() {
 
   const manejarClickLista = async (listaId) => {
     console.log(`ID de la lista seleccionada: ${listaId}`);
-  
+
     setIndiceSeleccionado(listaId);
     console.log(`Índice de lista seleccionado cambiado a: ${listaId}`);
-  
+
     try {
       const url = `http://localhost:3000/api/obtener-libros/${usuarioId}/${listaId}`;
       console.log(`URL de la solicitud: ${url}`);
-  
+
       const respuesta = await fetch(url);
-  
+
       console.log("Respuesta del fetch:", respuesta);
-  
+
       if (!respuesta.ok) {
-        console.error("Error en la respuesta del servidor:", respuesta.statusText);
+        console.error(
+          "Error en la respuesta del servidor:",
+          respuesta.statusText
+        );
         throw new Error("Error al obtener los libros de la lista");
       }
-  
+
       const data = await respuesta.json();
       console.log("Datos de libros obtenidos:", data);
-  
+
       setLibrosDeLista(data);
     } catch (error) {
       console.error("Error al obtener los libros de la lista:", error);
     }
-  };  
+  };
+
+  useEffect(() => {
+    console.log("Libros de lista actualizados:", librosDeLista);
+  }, [librosDeLista]);
 
   const manejarEditarClick = (listaId) => {
     const lista = listasDeLibros.find((lista) => lista._id === listaId);
@@ -348,20 +361,22 @@ function ComponenteListas() {
               <ItemLibro
                 libro={libro}
                 mostrarDiv={true}
-                onEliminar={() => {}}
-                onBookmarkClick={() => {}}
                 colorTextoTitulo="#f4e5e0"
                 colorTextoGenero="#252627"
                 colorFondo="#f4e5e0"
                 colorIcono="#f4e5e0"
-                favoritos={librosFavoritos}
                 context="listas"
-                handleHeartClick={handleHeartClick}
               />
             </div>
           ))}
         </div>
       </div>
+      {popupVisible && (
+        <ComponentePopupListas
+          libro={libroSeleccionado}
+          onClose={cerrarPopupLista}
+        />
+      )}
       <BotonSubir colorBoton="#f4e5e0" />
     </>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLibros } from "../contextos/contextoLibros";
 import { useListas } from "../contextos/contextoListas";
@@ -17,8 +17,7 @@ function PaginaPerfil() {
   const {
     cerrarPopupLista,
     libroSeleccionado,
-    listasDeLibros,
-    mostrarPopupListas,
+    popupVisible,
   } = useListas();
   const [mostrarPopup, setMostrarPopup] = useState(false);
 
@@ -113,11 +112,10 @@ function PaginaPerfil() {
           </div>
         </>
       )}
-      {mostrarPopupListas && (
+      {popupVisible && (
         <ComponentePopupListas
           libro={libroSeleccionado}
           onClose={cerrarPopupLista}
-          listasDeLibros={listasDeLibros}
         />
       )}
       <BotonSubir colorBoton="#252627" />

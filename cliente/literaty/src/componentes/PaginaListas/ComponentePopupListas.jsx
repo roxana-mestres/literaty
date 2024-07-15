@@ -4,14 +4,19 @@ import principal from "../../estilos/PaginaPrincipal.module.css";
 import { useListas } from "../../contextos/contextoListas";
 
 function ComponentePopupListas({ libro, onClose }) {
-  const { listas, cargandoListas, listasSeleccionadas, cambiado, handleCambioCheckbox, handleGuardarEnListas } = useListas();
+  const { listas, cargandoListas, listasSeleccionadas, cambiado, handleCambioCheckbox, handleGuardarEnListas,setListasSeleccionadas } = useListas();
 
+  const obtenerIdLibro = (libro) => libro._id || libro.id;
   useEffect(() => {
     if (!cargandoListas && libro) {
-      const listasConLibro = listas.filter((lista) =>
-        lista.libros.includes(libro.id)
-      );
-      console.log("Listas con el libro:", listasConLibro);
+      const idLibro = obtenerIdLibro(libro);
+      // Actualiza listasSeleccionadas con las listas que contienen el libro
+      const listasConLibro = listas
+        .filter(lista => lista.libros.includes(idLibro))
+        .map(lista => lista._id);
+
+      // Actualiza el estado de listasSeleccionadas
+      setListasSeleccionadas(listasConLibro);
     }
   }, [libro, listas, cargandoListas]);
 
@@ -24,7 +29,6 @@ function ComponentePopupListas({ libro, onClose }) {
         alert(mensaje);
       }
     } catch (error) {
-      console.error("Error al guardar:", error);
       alert("Hubo un error al intentar guardar el libro en las listas.");
     }
   };

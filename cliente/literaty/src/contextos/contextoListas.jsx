@@ -52,9 +52,8 @@ export const ListasProvider = ({ children }) => {
         }
       );
       const data = await respuesta.json();
-      console.log("Listas obtenidas:", data);
+      console.log("Listas obtenidas contexto:", data);
       setListas(data);
-
       const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
       if (listaMeGusta) {
         setLibrosFavoritos(listaMeGusta.libros);
@@ -77,7 +76,7 @@ export const ListasProvider = ({ children }) => {
   };
 
   const agregarLibroALista = async (listaId, libro, libroId) => {
-    console.log("Agregar libro a lista:", { listaId, libro });
+    console.log("Agregar libro a lista:", { listaId, libro, libroId});
     try {
       const respuesta = await fetch(
         `http://localhost:3000/api/listas/${listaId}/libros`,
@@ -88,7 +87,7 @@ export const ListasProvider = ({ children }) => {
           },
           body: JSON.stringify({
             usuarioId: "668e5211621febe6145303b4",
-            libroId: libro.id,
+            libroId: libro.id || libro._id,
           }),
         }
       );
@@ -200,6 +199,7 @@ export const ListasProvider = ({ children }) => {
       .map((lista) => lista._id);
 
     setListasSeleccionadas(listasQueContienenElLibro);
+    console.log("listasSeleccionadas contextoListas:",listasSeleccionadas)
   };
 
   const cerrarPopupLista = () => {
@@ -208,8 +208,11 @@ export const ListasProvider = ({ children }) => {
   };
 
   const handleCambioCheckbox = (listaId) => {
+    console.log("listaId en contextoListas", listaId)
+    console.log("listasSeleccionadas en handleCambioCheckbox antes de cambiar valor:", listasSeleccionadas)
     setListasSeleccionadas((prev) => {
       if (prev.includes(listaId)) {
+        console.log("listasSeleccionadas en handleCambioCheckbox después de cambiar valor:", listasSeleccionadas)
         return prev.filter((id) => id !== listaId);
       } else {
         return [...prev, listaId];
@@ -221,11 +224,14 @@ export const ListasProvider = ({ children }) => {
   const handleGuardarEnListas = async () => {
     if (!libroSeleccionado) return;
 
+    const obtenerIdLibro = (libro) => libro._id || libro.id;
+    const libroId = obtenerIdLibro(libroSeleccionado);
+
     const listasParaEliminar = listas
       .filter(
         (lista) =>
           !listasSeleccionadas.includes(lista._id) &&
-          lista.libros.includes(libroSeleccionado.id)
+          lista.libros.includes(libroId)
       )
       .map((lista) => lista._id);
 
@@ -233,14 +239,14 @@ export const ListasProvider = ({ children }) => {
       (id) =>
         !listas
           .find((lista) => lista._id === id)
-          .libros.includes(libroSeleccionado.id)
+          .libros.includes(libroId)
     );
 
     let mensaje = "";
 
     try {
       for (const listaId of listasParaEliminar) {
-        await eliminarLibroDeLista(listaId, libroSeleccionado.id);
+        await eliminarLibroDeLista(listaId, libroId);
       }
       for (const listaId of listasParaAgregar) {
         await agregarLibroALista(listaId, libroSeleccionado);
@@ -276,6 +282,7 @@ export const ListasProvider = ({ children }) => {
         librosGuardados,
         popupVisible,
         libroSeleccionado,
+        setListasSeleccionadas,
         listasSeleccionadas,
         cambiado,
         handleHeartClick,
