@@ -10,12 +10,10 @@ function ComponentePopupListas({ libro, onClose }) {
   useEffect(() => {
     if (!cargandoListas && libro) {
       const idLibro = obtenerIdLibro(libro);
-      // Actualiza listasSeleccionadas con las listas que contienen el libro
       const listasConLibro = listas
         .filter(lista => lista.libros.includes(idLibro))
         .map(lista => lista._id);
 
-      // Actualiza el estado de listasSeleccionadas
       setListasSeleccionadas(listasConLibro);
     }
   }, [libro, listas, cargandoListas]);

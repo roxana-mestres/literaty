@@ -215,13 +215,12 @@ function ComponenteListas() {
       (lista) => lista._id === listaId
     );
     if (listaSeleccionada) {
-      setNombreListaSeleccionada(listaSeleccionada.nombre); // Actualiza el nombre de la lista seleccionada
+      setNombreListaSeleccionada(listaSeleccionada.nombre);
     }
 
     setIndiceSeleccionado(listaId);
     console.log(`Índice de lista seleccionado cambiado a: ${listaId}`);
 
-    // Guardar en localStorage
     localStorage.setItem("indiceSeleccionado", listaId);
 
     try {

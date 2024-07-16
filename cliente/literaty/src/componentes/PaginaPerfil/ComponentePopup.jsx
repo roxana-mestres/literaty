@@ -9,16 +9,9 @@ function Popup({ contenido, onCerrarSesion }) {
       { texto: "Editar perfil", ruta: "/editar-perfil" },
       { texto: "Cerrar sesión", ruta: "/", onClick: onCerrarSesion },
     ],
-    resena: [
-      { texto: "Libros por leer", ruta: "/libros-por-leer" },
-      { texto: "Libros por comprar", ruta: "/libros-por-comprar" },
-      { texto: "Libros por releer", ruta: "/libros-por-releer" },
-    ],
-    // Otros contenidos por página
   };
 
   const itemsLista = contenidoPorPagina[contenido];
-  console.log(itemsLista);
 
   const [elementoResaltado, setElementoResaltado] = useState(null);
 

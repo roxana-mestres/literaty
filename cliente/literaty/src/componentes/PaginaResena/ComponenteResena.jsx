@@ -1,14 +1,23 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useListas } from "../../contextos/contextoListas";
 import estilos from "../../estilos/Comunes.module.css";
 import resena from "../../estilos/PaginaResena.module.css";
 import ItemLibro from "../PaginaPerfil/ComponenteItemLibro";
-import Popup from "../PaginaPerfil/ComponentePopup";
 import Footer from "../PaginaPerfil/ComponenteFooter";
+import PopupListas from "../PaginaListas/ComponentePopupListas";
 
 function ComponenteResena() {
   const [expandido, setExpandido] = useState(false);
-  const [mostrarPopup, setMostrarPopup] = useState(false);
+  const {
+    abrirPopupLista,
+    cerrarPopupLista,
+    handleCambioCheckbox,
+    handleGuardarEnListas,
+    popupVisible,
+    listasSeleccionadas,
+    libroSeleccionado,
+  } = useListas();
   const location = useLocation();
   const { libro } = location.state || {};
 
@@ -22,6 +31,10 @@ function ComponenteResena() {
   const textoResumido = palabras.slice(0, limitePalabras).join(" ");
   const mostrarLeerMas = palabras.length > limitePalabras;
 
+  const handleBookmarkClick = () => {
+    abrirPopupLista(libro);
+  };
+
   return (
     <>
       <div className={resena["div-flecha-itemlibro"]}>
@@ -33,7 +46,12 @@ function ComponenteResena() {
             arrow_back
           </span>
         </Link>
-        <ItemLibro className={resena["itemlibro"]} libro={libro} mostrarDiv={false} onEliminar={() => {}}/>
+        <ItemLibro
+          className={resena["itemlibro"]}
+          libro={libro}
+          mostrarDiv={false}
+          onEliminar={() => {}}
+        />
       </div>
       <div className={resena["textoresena"]}>
         <p>
@@ -53,20 +71,18 @@ function ComponenteResena() {
         iconos={["bookmark", "delete", "favorite"]}
         onIconClick={(icono) => {
           if (icono === "bookmark") {
-            setMostrarPopup((prevMostrarPopup) => !prevMostrarPopup);
+            handleBookmarkClick();
           }
         }}
-      />
-      {mostrarPopup && (
-        <>
-          <div
-            className={resena["popup-fondo"]}
-            onClick={() => setMostrarPopup(false)}
-          />
-          <div className={resena["popup"]}>
-            <Popup contenido="resena" className={resena["popup"]} />
-          </div>
-        </>
+      />    
+      {popupVisible && (
+        <PopupListas
+          libro={libroSeleccionado}
+          onClose={cerrarPopupLista}
+          listasSeleccionadas={listasSeleccionadas}
+          onCheckboxChange={handleCambioCheckbox}
+          onSave={handleGuardarEnListas}
+        />
       )}
     </>
   );
