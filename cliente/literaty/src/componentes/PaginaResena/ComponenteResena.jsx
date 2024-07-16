@@ -19,6 +19,7 @@ function ComponenteResena() {
     listasSeleccionadas,
     libroSeleccionado,
     eliminarLibroDeLista,
+    handleHeartClick,
   } = useListas();
   const { handleEliminarLibro } = useLibros();
   const location = useLocation();
@@ -68,6 +69,12 @@ function ComponenteResena() {
     }
   };
 
+  const handleFavoriteClick = () => {
+    const obtenerIdLibro = (libro) => libro._id || libro.id;
+    const libroId = obtenerIdLibro(libro);
+    handleHeartClick(libroId); 
+  };
+
   return (
     <>
       <div className={resena["div-flecha-itemlibro"]}>
@@ -107,6 +114,8 @@ function ComponenteResena() {
             handleBookmarkClick();
           } else if (icono === "delete") {
             handleEliminarLocal();
+          } else if (icono === "favorite") {
+            handleFavoriteClick();
           }
         }}
       />
