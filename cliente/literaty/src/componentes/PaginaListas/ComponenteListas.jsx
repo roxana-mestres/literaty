@@ -24,12 +24,9 @@ function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);
   const [librosDeLista, setLibrosDeLista] = useState([]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
-  const {
-    librosFavoritos,
-    popupVisible,
-    cerrarPopupLista,
-    libroSeleccionado,
-  } = useListas();
+  const [nombreListaSeleccionada, setNombreListaSeleccionada] = useState();
+  const { librosFavoritos, popupVisible, cerrarPopupLista, libroSeleccionado } =
+    useListas();
 
   useEffect(() => {
     const fetchListas = async () => {
@@ -52,9 +49,21 @@ function ComponenteListas() {
 
         setListasDeLibros(data);
 
-        const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
-        if (listaMeGusta) {
-          manejarClickLista(listaMeGusta._id);
+        const almacenadoIndice = localStorage.getItem("indiceSeleccionado");
+        if (almacenadoIndice) {
+          const listaSeleccionada = data.find(
+            (lista) => lista._id === almacenadoIndice
+          );
+          if (listaSeleccionada) {
+            manejarClickLista(listaSeleccionada._id);
+          }
+        } else {
+          const listaMeGusta = data.find(
+            (lista) => lista.nombre === "Me gusta"
+          );
+          if (listaMeGusta) {
+            manejarClickLista(listaMeGusta._id);
+          }
         }
       } catch (error) {
         console.error("Error al obtener las listas:", error);
@@ -202,8 +211,18 @@ function ComponenteListas() {
   const manejarClickLista = async (listaId) => {
     console.log(`ID de la lista seleccionada: ${listaId}`);
 
+    const listaSeleccionada = listasDeLibros.find(
+      (lista) => lista._id === listaId
+    );
+    if (listaSeleccionada) {
+      setNombreListaSeleccionada(listaSeleccionada.nombre); // Actualiza el nombre de la lista seleccionada
+    }
+
     setIndiceSeleccionado(listaId);
     console.log(`Índice de lista seleccionado cambiado a: ${listaId}`);
+
+    // Guardar en localStorage
+    localStorage.setItem("indiceSeleccionado", listaId);
 
     try {
       const url = `http://localhost:3000/api/obtener-libros/${usuarioId}/${listaId}`;
@@ -229,10 +248,6 @@ function ComponenteListas() {
       console.error("Error al obtener los libros de la lista:", error);
     }
   };
-
-  useEffect(() => {
-    console.log("Libros de lista actualizados:", librosDeLista);
-  }, [librosDeLista]);
 
   const manejarEditarClick = (listaId) => {
     const lista = listasDeLibros.find((lista) => lista._id === listaId);
@@ -353,7 +368,7 @@ function ComponenteListas() {
       </div>
       <div className={listas["seccion-libros"]}>
         <h1 className={listas["titulo-seccion-libros"]}>
-          Libros que me gustan
+          {nombreListaSeleccionada}
         </h1>
         <div className={principal["seccion-libros-grid"]}>
           {librosDeLista.map((libro) => (
@@ -366,6 +381,7 @@ function ComponenteListas() {
                 colorFondo="#f4e5e0"
                 colorIcono="#f4e5e0"
                 context="listas"
+                indiceSeleccionado={indiceSeleccionado}
               />
             </div>
           ))}
@@ -377,7 +393,6 @@ function ComponenteListas() {
           onClose={cerrarPopupLista}
         />
       )}
-      <BotonSubir colorBoton="#f4e5e0" />
     </>
   );
 }

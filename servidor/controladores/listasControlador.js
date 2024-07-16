@@ -175,10 +175,6 @@ const actualizarNombreLista = async (peticion, respuesta) => {
 const eliminarLibroDeLista = async (peticion, respuesta) => {
   const { usuarioId, listaId, libroId } = peticion.params;
 
-  console.log("ID Usuario:", usuarioId);
-  console.log("ID Lista:", listaId);
-  console.log("ID Libro:", libroId);
-
   try {
     const usuario = await Usuario.findById(usuarioId);
     if (!usuario) {

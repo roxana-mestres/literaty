@@ -22,7 +22,7 @@ div.div-general {
   margin-bottom: 50px;
   color: #252627;
 }
-a span{
+a span {
   left: 3%;
 }
 .circulo {
@@ -91,7 +91,7 @@ a {
 .titulo-seccion-libros {
   color: #f4e5e0;
   text-align: center;
-  padding-top: 100px;
+  padding-top: 80px;
 }
 .seccion-libros {
   background-image: url(../assets/fondo-listas.svg);

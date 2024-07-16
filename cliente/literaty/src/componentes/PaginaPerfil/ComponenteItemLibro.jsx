@@ -12,45 +12,65 @@ import bookmarkBorderBlack from "../../assets/bookmarkBorderBlack.svg";
 import bookmarkFillLight from "../../assets/bookmarkFillLight.svg";
 import bookmarkBorderLight from "../../assets/bookmarkBorderLight.svg";
 
-function ComponenteItemLibro({ libro, context, ...props }) {
+function ComponenteItemLibro({ libro, indiceSeleccionado, context, ...props }) {
   const navegar = useNavigate();
-  const {handleEliminarLibro} = useLibros();
+  const { handleEliminarLibro } = useLibros();
   const {
     librosFavoritos,
     librosGuardados,
     handleHeartClick,
     abrirPopupLista,
+    eliminarLibroDeLista,
   } = useListas();
 
   const obtenerIdLibro = (libro) => libro._id || libro.id;
   const libroId = obtenerIdLibro(libro);
 
-  const esFavorito = Array.isArray(librosFavoritos) && librosFavoritos.includes(libroId);
-  const estaGuardado = Array.isArray(librosGuardados) && librosGuardados.includes(libroId);
-  console.log("estaGuardado en perfil:", estaGuardado);
-  console.log("context en perfil:", context);
-  console.log("ID del libro itemLibro:", libroId);
-  console.log("Libros guardados en itemLibro:", librosGuardados);
+  const esFavorito =
+    Array.isArray(librosFavoritos) && librosFavoritos.includes(libroId);
+  const estaGuardado =
+    Array.isArray(librosGuardados) && librosGuardados.includes(libroId);
 
   const estiloTextoTitulo = { color: props.colorTextoTitulo };
-  const estiloGenero = { color: props.colorTextoGenero, backgroundColor: props.colorFondo };
+  const estiloGenero = {
+    color: props.colorTextoGenero,
+    backgroundColor: props.colorFondo,
+  };
   const estiloIcono = { color: props.colorIcono, fontSize: "24px" };
   const estiloTextoAutor = { color: props.colorIcono };
 
   const autores = Array.isArray(libro?.authors) ? libro.authors.join(", ") : "";
   const titulo = libro?.title || "";
-  const numeroEstrellas = typeof libro?.averageRating === "number" && !isNaN(libro?.averageRating)
-    ? Math.round(libro.averageRating)
-    : null;
+  const numeroEstrellas =
+    typeof libro?.averageRating === "number" && !isNaN(libro?.averageRating)
+      ? Math.round(libro.averageRating)
+      : null;
 
-  const tituloCortado = titulo.length > 25 ? titulo.slice(0, 25) + "..." : titulo;
-  const autoresCortados = autores.length > 25 ? autores.slice(0, 25) + "..." : autores;
+  const tituloCortado =
+    titulo.length > 25 ? titulo.slice(0, 25) + "..." : titulo;
+  const autoresCortados =
+    autores.length > 25 ? autores.slice(0, 25) + "..." : autores;
 
-  const handleEliminarLocal = () => {
-    if (libroId) {
-      handleEliminarLibro(libroId);
-    }
-  };
+    const handleEliminarLocal = () => {
+      if (!libroId) {
+        console.error("Error: No se encontró el ID del libro.");
+        return;
+      }
+  
+      if (context === "perfil") {
+        handleEliminarLibro(libroId);
+      } else if (context === "listas") {
+        if (!indiceSeleccionado) {
+          console.error("Error: No se ha seleccionado una lista actual.");
+          return;
+        }
+  
+        console.log("Eliminando libro:", libroId, "de la lista:", indiceSeleccionado);
+        eliminarLibroDeLista(indiceSeleccionado, libroId);
+      } else {
+        console.error("Error: Contexto no válido.");
+      }
+    };
 
   const handlePortadaClick = () => {
     navegar("/resena", { state: { libro } });
@@ -66,21 +86,23 @@ function ComponenteItemLibro({ libro, context, ...props }) {
     handleHeartClick(libroId);
   };
 
-  const iconoCorazon = context === "perfil"
-    ? esFavorito
-      ? heartFillBlack
-      : heartBorderBlack
-    : esFavorito
-    ? heartFillLight
-    : heartBorderLight;
+  const iconoCorazon =
+    context === "perfil"
+      ? esFavorito
+        ? heartFillBlack
+        : heartBorderBlack
+      : esFavorito
+      ? heartFillLight
+      : heartBorderLight;
 
-  const iconoBookmark = context === "perfil"
-    ? estaGuardado
-      ? bookmarkFillBlack
-      : bookmarkBorderBlack
-    : estaGuardado
-    ? bookmarkFillLight
-    : bookmarkBorderLight;
+  const iconoBookmark =
+    context === "perfil"
+      ? estaGuardado
+        ? bookmarkFillBlack
+        : bookmarkBorderBlack
+      : estaGuardado
+      ? bookmarkFillLight
+      : bookmarkBorderLight;
 
   return (
     <div className={`${principal["div-libro-notas"]} ${props.className}`}>
