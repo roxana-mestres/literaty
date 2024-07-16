@@ -6,7 +6,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import { LibrosProvider } from "./contextos/contextoLibros";
-import { ListasProvider } from './contextos/contextoListas';
+import { ListasProvider } from "./contextos/contextoListas";
+import { UsuarioProvider } from "./contextos/contextoUsuario";
 import PaginaInicio from "./paginas/PaginaInicio";
 import PaginaIniciarSesion from "./paginas/PaginaIniciarSesion";
 import PaginaCrearCuenta from "./paginas/PaginaCrearCuenta";
@@ -18,23 +19,25 @@ import Pagina404 from "./paginas/Pagina404";
 
 function App() {
   return (
-    <LibrosProvider>
-      <ListasProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<PaginaInicio />} />
-            <Route path="/iniciar-sesion" element={<PaginaIniciarSesion />} />
-            <Route path="/crear-cuenta" element={<PaginaCrearCuenta />} />
-            <Route path="/perfil" element={<PaginaPerfil />} />
-            <Route path="/resena" element={<PaginaResena />} />
-            <Route path="/listas" element={<PaginaListas />} />
-            <Route path="/pagina-401" element={<Pagina401 />} />
-            <Route path="/pagina-404" element={<Pagina404 />} />
-            <Route path="*" element={<Navigate to="/pagina-404" />} />
-          </Routes>
-        </Router>
-      </ListasProvider>
-    </LibrosProvider>
+    <UsuarioProvider>
+      <LibrosProvider>
+        <ListasProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<PaginaInicio />} />
+              <Route path="/iniciar-sesion" element={<PaginaIniciarSesion />} />
+              <Route path="/crear-cuenta" element={<PaginaCrearCuenta />} />
+              <Route path="/perfil" element={<PaginaPerfil />} />
+              <Route path="/resena" element={<PaginaResena />} />
+              <Route path="/listas" element={<PaginaListas />} />
+              <Route path="/pagina-401" element={<Pagina401 />} />
+              <Route path="/pagina-404" element={<Pagina404 />} />
+              <Route path="*" element={<Navigate to="/pagina-404" />} />
+            </Routes>
+          </Router>
+        </ListasProvider>
+      </LibrosProvider>
+    </UsuarioProvider>
   );
 }
 

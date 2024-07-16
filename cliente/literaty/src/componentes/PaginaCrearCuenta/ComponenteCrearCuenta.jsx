@@ -7,7 +7,6 @@ import avatar2 from "../../assets/avatar-2.svg";
 import avatar3 from "../../assets/avatar-3.svg";
 import avatar4 from "../../assets/avatar-4.svg";
 import avatar5 from "../../assets/avatar-5.svg";
-import avatar6 from "../../assets/avatar-6.svg";
 
 const ComponenteCrearCuenta = () => {
   const navegar = useNavigate();
@@ -18,7 +17,7 @@ const ComponenteCrearCuenta = () => {
   const [repetirContrasenaVisible, setRepetirContrasenaVisible] =
     useState(false);
   const [mostrarRequisitos, setMostrarRequisitos] = useState(false);
-  const imagenesAvatar = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6];
+  const imagenesAvatar = [avatar1, avatar2, avatar3, avatar4, avatar5];
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",

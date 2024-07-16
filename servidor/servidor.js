@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const authRutas = require("./rutas/authRutas");
 const listasRutas = require("./rutas/listasRutas");
 const librosRutas = require("./rutas/librosRutas");
+const usuarioRutas = require("./rutas/usuarioRutas");
 const cors = require("cors");
 
 // Configuración variables de entorno desde .env
@@ -35,6 +36,7 @@ mongoose
 app.use("/api", authRutas);
 app.use('/api', listasRutas);
 app.use("/api", librosRutas);
+app.use("/api", usuarioRutas);
 
 // Ruta principal para servir el archivo index.html
 app.get("/", (peticion, respuesta) => {
