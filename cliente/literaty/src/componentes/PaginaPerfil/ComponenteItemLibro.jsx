@@ -73,7 +73,7 @@ function ComponenteItemLibro({ libro, indiceSeleccionado, context, ...props }) {
     };
 
   const handlePortadaClick = () => {
-    navegar("/resena", { state: { libro } });
+    navegar("/resena", { state: { libro, context, indiceSeleccionado } });
   };
 
   const handleBookmarkClickLocal = (e) => {

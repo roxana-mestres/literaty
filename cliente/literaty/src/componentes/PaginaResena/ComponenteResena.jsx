@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useListas } from "../../contextos/contextoListas";
+import { useLibros } from "../../contextos/contextoLibros";
 import estilos from "../../estilos/Comunes.module.css";
 import resena from "../../estilos/PaginaResena.module.css";
 import ItemLibro from "../PaginaPerfil/ComponenteItemLibro";
@@ -17,9 +18,12 @@ function ComponenteResena() {
     popupVisible,
     listasSeleccionadas,
     libroSeleccionado,
+    eliminarLibroDeLista,
   } = useListas();
+  const { handleEliminarLibro } = useLibros();
   const location = useLocation();
-  const { libro } = location.state || {};
+  const navegar = useNavigate();
+  const { libro, context, indiceSeleccionado } = location.state || {};
 
   if (!libro) {
     return <div>No se ha encontrado la información del libro.</div>;
@@ -33,6 +37,35 @@ function ComponenteResena() {
 
   const handleBookmarkClick = () => {
     abrirPopupLista(libro);
+  };
+
+  const handleEliminarLocal = () => {
+    const obtenerIdLibro = (libro) => libro._id || libro.id;
+    const libroId = obtenerIdLibro(libro);
+    if (!libroId) {
+      console.error("Error: No se encontró el ID del libro.");
+      return;
+    }
+
+    if (context === "perfil") {
+      handleEliminarLibro(libroId);
+      navegar("/perfil");
+    } else if (context === "listas") {
+      if (!indiceSeleccionado) {
+        console.error("Error: No se ha seleccionado una lista actual.");
+        return;
+      }
+      console.log(
+        "Eliminando libro:",
+        libroId,
+        "de la lista:",
+        indiceSeleccionado
+      );
+      eliminarLibroDeLista(indiceSeleccionado, libroId);
+      navegar(`/listas`);
+    } else {
+      console.error("Error: Contexto no válido.");
+    }
   };
 
   return (
@@ -72,9 +105,11 @@ function ComponenteResena() {
         onIconClick={(icono) => {
           if (icono === "bookmark") {
             handleBookmarkClick();
+          } else if (icono === "delete") {
+            handleEliminarLocal();
           }
         }}
-      />    
+      />
       {popupVisible && (
         <PopupListas
           libro={libroSeleccionado}
