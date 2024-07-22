@@ -25,8 +25,12 @@ export const UsuarioProvider = ({ children }) => {
     fetchUsuario();
   }, []);
 
+  const actualizarDataUsuario = (dataUsuarioActualizada) => {
+    setUsuario(dataUsuarioActualizada);
+  };
+
   return (
-    <UsuarioContexto.Provider value={{ usuario }}>
+    <UsuarioContexto.Provider value={{ usuario, actualizarDataUsuario }}>
       {children}
     </UsuarioContexto.Provider>
   );
