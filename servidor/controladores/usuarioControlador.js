@@ -1,4 +1,5 @@
 const Usuario = require("../modelos/Usuario");
+const bcrypt = require("bcrypt");
 
 const obtenerIdDelUsuarioPorEmail = async (email) => {
   try {
@@ -59,8 +60,59 @@ const actualizarUsuario = async (peticion, respuesta) => {
   }
 };
 
+const actualizarContrasena = async (peticion, respuesta) => {
+  const { usuarioId } = peticion.params;
+  const { contrasenaActual, contrasena } = peticion.body;
+
+  console.log('ID de usuario:', usuarioId);
+  console.log('Contraseña actual:', contrasenaActual);
+  console.log('Nueva contraseña:', contrasena);
+
+  try {
+    const usuario = await Usuario.findById(usuarioId);
+    console.log('Usuario encontrado:', usuario);
+
+    if (!usuario) {
+      return respuesta.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    if (!contrasenaActual || !contrasena) {
+      console.log('Datos de contraseña faltantes.');
+      return respuesta.status(400).json({ mensaje: 'Datos de contraseña incompletos' });
+    }
+
+    const contrasenaValida = await bcrypt.compare(contrasenaActual, usuario.password);
+    console.log('Contraseña actual válida:', contrasenaValida);
+
+    if (!contrasenaValida) {
+      return respuesta.status(400).json({ mensaje: 'La contraseña actual es incorrecta' });
+    }
+
+    if (!validarContrasena(contrasena)) {
+      return respuesta.status(400).json({ mensaje: 'La nueva contraseña no cumple con los requisitos' });
+    }
+
+    const nuevaContrasenaHash = await bcrypt.hash(contrasena, 10);
+    console.log('Nueva contraseña hasheada:', nuevaContrasenaHash);
+
+    usuario.password = nuevaContrasenaHash;
+    await usuario.save();
+
+    respuesta.json({ mensaje: 'Contraseña actualizada con éxito' });
+  } catch (error) {
+    console.error('Error al actualizar la contraseña:', error);
+    respuesta.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+};
+
+const validarContrasena = (password) => {
+  const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
+  return regexContrasena.test(password);
+};
+
 module.exports = {
   obtenerIdDelUsuarioPorEmail,
   obtenerUsuario,
   actualizarUsuario,
+  actualizarContrasena,
 };

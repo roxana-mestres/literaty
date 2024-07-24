@@ -8,5 +8,6 @@ router.get("/perfil", (peticion, respuesta) => {
 
 router.get('/:usuarioId', usuarioControlador.obtenerUsuario);
 router.put('/actualizar/:usuarioId', usuarioControlador.actualizarUsuario);
+router.put("/actualizar-contrasena/:usuarioId", usuarioControlador.actualizarContrasena);
 
 module.exports = router;

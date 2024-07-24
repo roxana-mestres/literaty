@@ -18,6 +18,7 @@ function PaginaEditarPerfil() {
   const [contrasena, setContrasena] = useState("");
   const [contrasenaRepetida, setContrasenaRepetida] = useState("");
   const [indiceAvatar, setIndiceAvatar] = useState(dataUsuario.avatar || 0);
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
 
   const avatares = [avatar0, avatar1, avatar2, avatar3, avatar4, avatar5];
 
@@ -27,6 +28,10 @@ function PaginaEditarPerfil() {
 
   const cambiarAvatar = () => {
     setIndiceAvatar((prevIndice) => (prevIndice + 1) % avatares.length);
+  };
+
+  const toggleMostrarContrasena = () => {
+    setMostrarContrasena(!mostrarContrasena);
   };
 
   const handleCambioInput = (campo, valor) => {
@@ -66,6 +71,62 @@ function PaginaEditarPerfil() {
       console.error("Error al actualizar el usuario:", error);
     }
   };
+
+  const handleActualizarContrasena = async () => {
+    if (contrasena !== contrasenaRepetida) {
+        alert("Las contraseñas nuevas no coinciden.");
+        console.log("Las contraseñas nuevas no coinciden.");
+        return;
+    }
+
+    if (contrasena && !validarContrasena(contrasena)) {
+        alert("La nueva contraseña no cumple con los requisitos.");
+        console.log("La nueva contraseña no cumple con los requisitos.");
+        return;
+    }
+
+    const usuarioId = "668e5211621febe6145303b4";
+
+    try {
+        console.log("Enviando petición para actualizar la contraseña...");
+        const respuesta = await fetch(
+            `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    contrasenaActual,
+                    contrasena,
+                }),
+            }
+        );
+
+        if (!respuesta.ok) {
+            const errorData = await respuesta.json();
+            console.log("Respuesta no OK:", errorData);
+            throw new Error(errorData.mensaje || "Error al actualizar la contraseña");
+        }
+
+        setContrasena("");
+        setContrasenaRepetida("");
+        setContrasenaActual("");
+
+        alert("La contraseña ha sido actualizada correctamente.");
+        console.log("La contraseña ha sido actualizada correctamente.");
+    } catch (error) {
+        console.error("Error al actualizar la contraseña:", error);
+        alert("Hubo un problema al actualizar la contraseña.");
+    }
+};
+
+const validarContrasena = (password) => {
+    const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
+    const esValida = regexContrasena.test(password);
+    console.log("Contraseña válida:", esValida);
+    return esValida;
+};
 
   const contenidoPersonalizado = (
     <div className={estilosEditarPerfil["div-tarjeta"]}>
@@ -127,36 +188,63 @@ function PaginaEditarPerfil() {
             <p>
               <b>Contraseña actual:</b>
             </p>
-            <input
-              type="password"
-              value={contrasenaActual}
-              onChange={(e) => setContrasenaActual(e.target.value)}
-            />
+            <div className={`${estilosEditarPerfil["input-container"]}`}>
+              <input
+                type={mostrarContrasena ? "text" : "password"}
+                value={contrasenaActual}
+                onChange={(e) => setContrasenaActual(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={toggleMostrarContrasena}
+                className={estilosEditarPerfil["mostrar-contrasena"]}
+              >
+                {mostrarContrasena ? "Ocultar" : "Mostrar"}
+              </button>
+            </div>
           </div>
           <div className={`${estilosEditarPerfil["div-contrasenas"]}`}>
             <p>
               <b>Nueva contraseña:</b>
             </p>
-            <input
-              type="password"
-              value={contrasena}
-              onChange={(e) => setContrasena(e.target.value)}
-            />
+            <div className={`${estilosEditarPerfil["input-container"]}`}>
+              <input
+                type={mostrarContrasena ? "text" : "password"}
+                value={contrasena}
+                onChange={(e) => setContrasena(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={toggleMostrarContrasena}
+                className={estilosEditarPerfil["mostrar-contrasena"]}
+              >
+                {mostrarContrasena ? "Ocultar" : "Mostrar"}
+              </button>
+            </div>
           </div>
           <div className={`${estilosEditarPerfil["div-contrasenas"]}`}>
             <p>
               <b>Confirmar nueva contraseña:</b>
             </p>
-            <input
-              type="password"
-              value={contrasenaRepetida}
-              onChange={(e) => setContrasenaRepetida(e.target.value)}
-            />
+            <div className={`${estilosEditarPerfil["input-container"]}`}>
+              <input
+                type={mostrarContrasena ? "text" : "password"}
+                value={contrasenaRepetida}
+                onChange={(e) => setContrasenaRepetida(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={toggleMostrarContrasena}
+                className={estilosEditarPerfil["mostrar-contrasena"]}
+              >
+                {mostrarContrasena ? "Ocultar" : "Mostrar"}
+              </button>
+            </div>
           </div>
         </div>
         <button
           className={`${estilos["boton"]} ${estilosEditarPerfil["boton-actualizar"]}`}
-          onClick={handleGuardarCambios}
+          onClick={handleActualizarContrasena}
         >
           Actualizar
         </button>
