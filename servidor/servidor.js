@@ -36,7 +36,7 @@ mongoose
 app.use("/api", authRutas);
 app.use('/api', listasRutas);
 app.use("/api", librosRutas);
-app.use("/api", usuarioRutas);
+app.use("/api/usuario", usuarioRutas);
 
 // Ruta principal para servir el archivo index.html
 app.get("/", (peticion, respuesta) => {

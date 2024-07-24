@@ -6,6 +6,7 @@ router.get("/perfil", (peticion, respuesta) => {
   respuesta.json({ usuario: peticion.usuario });
 });
 
-router.get('/usuario/:usuarioId', usuarioControlador.obtenerUsuario);
+router.get('/:usuarioId', usuarioControlador.obtenerUsuario);
+router.put('/actualizar/:usuarioId', usuarioControlador.actualizarUsuario);
 
 module.exports = router;

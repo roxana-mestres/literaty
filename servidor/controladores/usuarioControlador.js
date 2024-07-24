@@ -27,7 +27,40 @@ const obtenerUsuario = async (peticion, respuesta) => {
   }
 };
 
+const actualizarUsuario = async (peticion, respuesta) => {
+  const { usuarioId } = peticion.params;
+  const { nombre, email, avatar } = peticion.body;
+
+  console.log('Parámetros recibidos:', peticion.params);
+  console.log('Cuerpo de la solicitud:', peticion.body);
+
+  try {
+    const usuario = await Usuario.findById(usuarioId);
+
+    console.log('Usuario encontrado:', usuario);
+
+    if (!usuario) {
+      console.log('Usuario no encontrado');
+      return respuesta.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    usuario.nombre = nombre || usuario.nombre;
+    usuario.email = email || usuario.email;
+    usuario.avatar = avatar !== undefined ? avatar : usuario.avatar;
+
+    await usuario.save();
+
+    console.log('Usuario actualizado:', usuario);
+
+    respuesta.json(usuario);
+  } catch (error) {
+    console.error('Error al actualizar el usuario:', error);
+    respuesta.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   obtenerIdDelUsuarioPorEmail,
   obtenerUsuario,
+  actualizarUsuario,
 };
