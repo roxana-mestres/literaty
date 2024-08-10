@@ -10,7 +10,7 @@ export const UsuarioProvider = ({ children }) => {
   useEffect(() => {
     const fetchUsuario = async () => {
       try {
-        const usuarioId = '668e5211621febe6145303b4';
+        const usuarioId = '66b48c81d6db946021330d9a';
         const respuesta = await fetch(`http://localhost:3000/api/usuario/${usuarioId}`);
         if (!respuesta.ok) {
           throw new Error('Error al obtener los datos del usuario');

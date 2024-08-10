@@ -39,7 +39,7 @@ function PaginaEditarPerfil() {
   };
 
   const handleGuardarCambios = async () => {
-    const usuarioId = "668e5211621febe6145303b4";
+    const usuarioId = "66b48c81d6db946021330d9a";
 
     try {
       const respuesta = await fetch(
@@ -85,7 +85,7 @@ function PaginaEditarPerfil() {
         return;
     }
 
-    const usuarioId = "668e5211621febe6145303b4";
+    const usuarioId = "66b48c81d6db946021330d9a";
 
     try {
         console.log("Enviando petición para actualizar la contraseña...");

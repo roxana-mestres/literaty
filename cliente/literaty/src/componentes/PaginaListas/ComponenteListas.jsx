@@ -18,7 +18,7 @@ const iconosLibros = [
   "/src/assets/libro-6.svg",
 ];
 
-const usuarioId = "668e5211621febe6145303b4";
+const usuarioId = "66b48c81d6db946021330d9a";
 
 function ComponenteListas() {
   const [listasDeLibros, setListasDeLibros] = useState([]);

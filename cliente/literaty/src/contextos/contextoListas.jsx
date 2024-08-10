@@ -40,7 +40,7 @@ export const ListasProvider = ({ children }) => {
 
   const obtenerListas = async () => {
     setCargandoListas(true);
-    const usuarioId = "668e5211621febe6145303b4";
+    const usuarioId = "66b48c81d6db946021330d9a";
     try {
       const respuesta = await fetch(
         `http://localhost:3000/api/listas/${usuarioId}`,
@@ -86,7 +86,7 @@ export const ListasProvider = ({ children }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            usuarioId: "668e5211621febe6145303b4",
+            usuarioId: "66b48c81d6db946021330d9a",
             libroId: libro.id || libro._id,
           }),
         }
@@ -106,7 +106,7 @@ export const ListasProvider = ({ children }) => {
   };
 
   const eliminarLibroDeLista = async (listaId, libroId) => {
-    const usuarioId = "668e5211621febe6145303b4";
+    const usuarioId = "66b48c81d6db946021330d9a";
     try {
       const respuesta = await fetch(
         `http://localhost:3000/api/listas/${usuarioId}/${listaId}/libros/${libroId}`,
