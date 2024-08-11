@@ -1,30 +1,32 @@
 const Usuario = require("../modelos/Usuario");
+const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
 
-const obtenerIdDelUsuarioPorEmail = async (email) => {
+const obtenerUsuarioPorToken = async (peticion, respuesta) => {
   try {
-    const usuario = await Usuario.findOne({ email }).select("_id");
-    return usuario ? usuario._id : null;
-  } catch (error) {
-    throw new Error("Error al obtener ID del usuario por email");
-  }
-};
+    const token = peticion.cookies.access_token;
+    console.log("Token recibido:", token);
 
-const obtenerUsuario = async (peticion, respuesta) => {
-  try {
-    const { usuarioId } = peticion.params;
-    console.log('Parámetros recibidos:', peticion.params); 
-    const usuario = await Usuario.findById(usuarioId);
-    console.log('Usuario encontrado:', usuario);
-
-    if (!usuario) {
-      return respuesta.status(404).json({ mensaje: 'Usuario no encontrado' });
+    if (!token) {
+      console.log("No se recibió ningún token");
+      return respuesta.status(401).json({ message: 'No hay token de autenticación' });
     }
 
-    respuesta.json(usuario);
+    const data = jwt.verify(token, process.env.CLAVE);
+    console.log("Datos decodificados del token:", data);
+
+    const usuario = await Usuario.findById(data.id);
+    console.log("Usuario encontrado en la base de datos:", usuario);
+
+    if (!usuario) {
+      console.log("Usuario no encontrado con el ID proporcionado por el token");
+      return respuesta.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    respuesta.status(200).json(usuario);
   } catch (error) {
-    console.error('Error al obtener los datos del usuario:', error);
-    respuesta.status(500).json({ mensaje: 'Error interno del servidor' });
+    console.error('Error al obtener el usuario:', error);
+    respuesta.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
 };
 
@@ -111,8 +113,7 @@ const validarContrasena = (password) => {
 };
 
 module.exports = {
-  obtenerIdDelUsuarioPorEmail,
-  obtenerUsuario,
+  obtenerUsuarioPorToken,
   actualizarUsuario,
   actualizarContrasena,
 };

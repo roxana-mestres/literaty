@@ -20,7 +20,7 @@ function EditarPerfil({
   return (
     <div className={estilosEditarPerfil["cuerpo-editar-perfil"]}>
       <Link
-        to="/libros"
+        to="/perfil"
         className={estilosEditarPerfil["flecha-editar-perfil"]}
       >
         <span

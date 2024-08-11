@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { crearCuenta, iniciarSesion, cerrarSesion } = require("../controladores/authControlador");
+const verificarToken = require("../middlewares/authMiddleware");
+const { crearCuenta, iniciarSesion, cerrarSesion, accesoRutaProtegida } = require("../controladores/authControlador");
 
+router.get('/verificar-token', verificarToken, (peticion, respuesta) => {
+    respuesta.json({ message: 'Token es válido', usuario: peticion.usuario });
+  });
+router.get('/ruta-protegida', verificarToken, accesoRutaProtegida);
 router.post("/iniciar-sesion", iniciarSesion);
 router.post("/crear-cuenta", crearCuenta);
 router.post("/cerrar-sesion", cerrarSesion);

@@ -39,7 +39,7 @@ function PaginaEditarPerfil() {
   };
 
   const handleGuardarCambios = async () => {
-    const usuarioId = "66b48c81d6db946021330d9a";
+    const usuarioId = dataUsuario._id;
 
     try {
       const respuesta = await fetch(
@@ -74,59 +74,59 @@ function PaginaEditarPerfil() {
 
   const handleActualizarContrasena = async () => {
     if (contrasena !== contrasenaRepetida) {
-        alert("Las contraseñas nuevas no coinciden.");
-        console.log("Las contraseñas nuevas no coinciden.");
-        return;
+      alert("Las contraseñas nuevas no coinciden.");
+      console.log("Las contraseñas nuevas no coinciden.");
+      return;
     }
 
     if (contrasena && !validarContrasena(contrasena)) {
-        alert("La nueva contraseña no cumple con los requisitos.");
-        console.log("La nueva contraseña no cumple con los requisitos.");
-        return;
+      alert("La nueva contraseña no cumple con los requisitos.");
+      console.log("La nueva contraseña no cumple con los requisitos.");
+      return;
     }
 
-    const usuarioId = "66b48c81d6db946021330d9a";
+    const usuarioId = dataUsuario._id;
 
     try {
-        console.log("Enviando petición para actualizar la contraseña...");
-        const respuesta = await fetch(
-            `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    contrasenaActual,
-                    contrasena,
-                }),
-            }
-        );
-
-        if (!respuesta.ok) {
-            const errorData = await respuesta.json();
-            console.log("Respuesta no OK:", errorData);
-            throw new Error(errorData.mensaje || "Error al actualizar la contraseña");
+      console.log("Enviando petición para actualizar la contraseña...");
+      const respuesta = await fetch(
+        `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contrasenaActual,
+            contrasena,
+          }),
         }
+      );
 
-        setContrasena("");
-        setContrasenaRepetida("");
-        setContrasenaActual("");
+      if (!respuesta.ok) {
+        const errorData = await respuesta.json();
+        console.log("Respuesta no OK:", errorData);
+        throw new Error(errorData.mensaje || "Error al actualizar la contraseña");
+      }
 
-        alert("La contraseña ha sido actualizada correctamente.");
-        console.log("La contraseña ha sido actualizada correctamente.");
+      setContrasena("");
+      setContrasenaRepetida("");
+      setContrasenaActual("");
+
+      alert("La contraseña ha sido actualizada correctamente.");
+      console.log("La contraseña ha sido actualizada correctamente.");
     } catch (error) {
-        console.error("Error al actualizar la contraseña:", error);
-        alert("Hubo un problema al actualizar la contraseña.");
+      console.error("Error al actualizar la contraseña:", error);
+      alert("Hubo un problema al actualizar la contraseña.");
     }
-};
+  };
 
-const validarContrasena = (password) => {
+  const validarContrasena = (password) => {
     const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
     const esValida = regexContrasena.test(password);
     console.log("Contraseña válida:", esValida);
     return esValida;
-};
+  };
 
   const contenidoPersonalizado = (
     <div className={estilosEditarPerfil["div-tarjeta"]}>

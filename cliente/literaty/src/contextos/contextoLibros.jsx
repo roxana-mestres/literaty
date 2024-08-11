@@ -1,26 +1,36 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useUsuario } from './contextoUsuario';
 
 const LibrosContexto = createContext();
 
 export const useLibros = () => useContext(LibrosContexto);
 
 export const LibrosProvider = ({ children }) => {
+  const { usuario, cargando: cargandoUsuario } = useUsuario();
   const [libros, setLibros] = useState([]);
   const [cargando, setCargando] = useState(false);
-  const [emailUsuario, setEmailUsuario] = useState('roxana.mestres@hotmail.com');
+  const [error, setError] = useState(null);
+
+  console.log("ID de usuario en contextoLibros:", usuario._id);
+  console.log("usuario en contextoLibros:", usuario);
 
   useEffect(() => {
-    const librosGuardados = localStorage.getItem("libros");
-    if (librosGuardados) {
-      setLibros(JSON.parse(librosGuardados));
-    } else {
+    if (!cargandoUsuario && usuario._id) {
       obtenerLibros();
     }
-  }, []);
+  }, [usuario, cargandoUsuario]);
 
   const obtenerLibros = async (intentos = 3) => {
     setCargando(true);
     let data = [];
+    const usuarioId = usuario._id;
+
+    if (!usuarioId) {
+      setError("No se pudo obtener el ID del usuario.");
+      setCargando(false);
+      return;
+    }
+
     for (let i = 0; i < intentos; i++) {
       try {
         const respuesta = await fetch("http://localhost:3000/api/libros", {
@@ -28,12 +38,12 @@ export const LibrosProvider = ({ children }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email: emailUsuario }),
+          credentials: 'include',
+          body: JSON.stringify({ usuarioId }) // Enviar el ID del usuario en el cuerpo de la solicitud si es necesario
         });
 
         if (respuesta.ok) {
           data = await respuesta.json();
-
           if (data.length >= 12) {
             break;
           }
@@ -44,7 +54,7 @@ export const LibrosProvider = ({ children }) => {
         console.error("Error al obtener libros:", error);
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 1000));
     }
 
     setLibros(data);
@@ -52,14 +62,23 @@ export const LibrosProvider = ({ children }) => {
   };
 
   const handleEliminarLibro = async (libroId) => {
-    const emailUsuario = "roxana.mestres@hotmail.com";
+    if (cargandoUsuario) return;
+
+    const usuarioId= usuario._id;
+
+    if (!usuarioId) {
+      setError("No se pudo obtener el ID del usuario.");
+      return;
+    }
+
     try {
       const respuesta = await fetch(`http://localhost:3000/api/libros/${libroId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: emailUsuario }),
+        credentials: 'include',
+        body: JSON.stringify({ usuarioId }) 
       });
 
       if (respuesta.ok) {
@@ -75,7 +94,7 @@ export const LibrosProvider = ({ children }) => {
   };
 
   return (
-    <LibrosContexto.Provider value={{ libros, setLibros, cargando, obtenerLibros, handleEliminarLibro }}>
+    <LibrosContexto.Provider value={{ libros, cargando, error, obtenerLibros, handleEliminarLibro }}>
       {children}
     </LibrosContexto.Provider>
   );

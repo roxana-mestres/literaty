@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useListas } from "../../contextos/contextoListas";
+import { useUsuario } from "../../contextos/contextoUsuario";
 import { Link } from "react-router-dom";
 import estilos from "../../estilos/Comunes.module.css";
 import resena from "../../estilos/PaginaResena.module.css";
 import listas from "../../estilos/estilosListas.module.css";
 import principal from "../../estilos/PaginaPrincipal.module.css";
 import ItemLibro from "../PaginaPerfil/ComponenteItemLibro";
-import BotonSubir from "../../componentes/PaginaPerfil/ComponenteBotonSubir";
 import ComponentePopupListas from "../../componentes/PaginaListas/ComponentePopupListas";
 
 const iconosLibros = [
@@ -18,9 +18,8 @@ const iconosLibros = [
   "/src/assets/libro-6.svg",
 ];
 
-const usuarioId = "66b48c81d6db946021330d9a";
-
 function ComponenteListas() {
+  const { usuario: dataUsuario } = useUsuario();
   const [listasDeLibros, setListasDeLibros] = useState([]);
   const [librosDeLista, setLibrosDeLista] = useState([]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
@@ -28,52 +27,52 @@ function ComponenteListas() {
   const { librosFavoritos, popupVisible, cerrarPopupLista, libroSeleccionado } =
     useListas();
 
-  useEffect(() => {
-    const fetchListas = async () => {
-      try {
-        console.log(`Fetching listas for usuarioId: ${usuarioId}`);
-        const respuesta = await fetch(
-          `http://localhost:3000/api/listas/${usuarioId}`
-        );
-        console.log("Respuesta fetch:", respuesta);
-        if (!respuesta.ok) {
-          throw new Error("Error al obtener las listas");
-        }
-        let data = await respuesta.json();
-        console.log("Listas obtenidas:", data);
+    const usuarioId = dataUsuario._id;
 
-        data = data.map((lista, index) => ({
-          ...lista,
-          icono: lista.icono || iconosLibros[index % iconosLibros.length],
-        }));
-
-        setListasDeLibros(data);
-
-        const almacenadoIndice = localStorage.getItem("indiceSeleccionado");
-        if (almacenadoIndice) {
-          const listaSeleccionada = data.find(
-            (lista) => lista._id === almacenadoIndice
-          );
-          if (listaSeleccionada) {
-            manejarClickLista(listaSeleccionada._id);
+    useEffect(() => {
+      const fetchListas = async () => {
+        try {
+          console.log(`Fetching listas for usuarioId: ${usuarioId}`);
+          const respuesta = await fetch(`http://localhost:3000/api/listas/${usuarioId}`);
+          console.log("Respuesta fetch:", respuesta);
+          if (!respuesta.ok) {
+            throw new Error("Error al obtener las listas");
           }
-        } else {
-          const listaMeGusta = data.find(
-            (lista) => lista.nombre === "Me gusta"
-          );
-          if (listaMeGusta) {
-            manejarClickLista(listaMeGusta._id);
+          let data = await respuesta.json();
+          console.log("Listas obtenidas:", data);
+  
+          data = data.map((lista, index) => ({
+            ...lista,
+            icono: lista.icono || iconosLibros[index % iconosLibros.length],
+          }));
+  
+          setListasDeLibros(data);
+  
+          const almacenadoIndice = localStorage.getItem("indiceSeleccionado");
+          if (almacenadoIndice) {
+            const listaSeleccionada = data.find(
+              (lista) => lista._id === almacenadoIndice
+            );
+            if (listaSeleccionada) {
+              manejarClickLista(listaSeleccionada._id);
+            }
+          } else {
+            const listaMeGusta = data.find(
+              (lista) => lista.nombre === "Me gusta"
+            );
+            if (listaMeGusta) {
+              manejarClickLista(listaMeGusta._id);
+            }
           }
+        } catch (error) {
+          console.error("Error al obtener las listas:", error);
         }
-      } catch (error) {
-        console.error("Error al obtener las listas:", error);
+      };
+  
+      if (usuarioId) { 
+        fetchListas();
       }
-    };
-
-    if (usuarioId) {
-      fetchListas();
-    }
-  }, [usuarioId, librosFavoritos]);
+    }, [usuarioId, librosFavoritos]);
 
   const agregarLista = async () => {
     try {

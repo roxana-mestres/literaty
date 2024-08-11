@@ -1,4 +1,4 @@
-const { obtenerIdDelUsuarioPorEmail } = require("./usuarioControlador");
+const jwt = require("jsonwebtoken");
 
 const buscarLibros = async (peticion, respuesta) => {
   const termino = peticion.query.termino;
@@ -22,10 +22,19 @@ const buscarLibros = async (peticion, respuesta) => {
 };
 
 const obtenerLibros = async (peticion, respuesta) => {
-  const emailUsuario = peticion.body.email;
-
   try {
-    const usuarioId = await obtenerIdDelUsuarioPorEmail(emailUsuario);
+    const token = peticion.cookies.access_token;
+    console.log("Token recibido librosControlador:", token);
+    if (!token) {
+      return respuesta
+        .status(401)
+        .json({ message: "No hay token de autenticación" });
+    }
+
+    const data = jwt.verify(token, process.env.CLAVE);
+    const usuarioId = data.id;
+
+    console.log("Datos del usuario librosControlador:", data);
 
     if (!usuarioId) {
       return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });
@@ -63,7 +72,7 @@ const obtenerLibros = async (peticion, respuesta) => {
       "juvenile nonfiction",
       "education",
       "children's stories",
-      "animals"
+      "animals",
     ]);
 
     while (librosFiltrados.length < cantidadDeseada && intentos < maxIntentos) {
@@ -106,35 +115,56 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     respuesta.json(librosFiltrados);
   } catch (error) {
-    console.error("Error al obtener libros por preferencias:", error);
+    console.error("Error al obtener libros librosControlador:", error);
+    if (error.name === "JsonWebTokenError") {
+      console.error("Error de JWT:", error.message);
+      return respuesta
+        .status(401)
+        .json({ mensaje: "Token inválido o expirado" });
+    }
     respuesta
       .status(500)
-      .json({ mensaje: "Error al obtener libros por preferencias", error });
+      .json({ mensaje: "Error al obtener libros libroControlador", error });
   }
 };
 
 const librosEliminadosPorUsuario = new Map();
 
 const eliminarLibro = async (peticion, respuesta) => {
-  const { email } = peticion.body;
   const libroId = peticion.params.id;
 
-  if (!email || !libroId) {
-    return respuesta.status(400).json({ message: 'Faltan parámetros' });
+  if (!libroId) {
+    return respuesta.status(400).json({ message: "Faltan parámetros" });
   }
 
-  const usuarioId = await obtenerIdDelUsuarioPorEmail(email);
-  if (!usuarioId) {
-    return respuesta.status(404).json({ message: 'Usuario no encontrado' });
+  try {
+    const token = peticion.cookies.access_token;
+    if (!token) {
+      return respuesta
+        .status(401)
+        .json({ message: "No hay token de autenticación" });
+    }
+
+    const data = jwt.verify(token, process.env.CLAVE);
+    const usuarioId = data.id;
+
+    if (!usuarioId) {
+      return respuesta.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    if (!librosEliminadosPorUsuario.has(usuarioId)) {
+      librosEliminadosPorUsuario.set(usuarioId, new Set());
+    }
+
+    librosEliminadosPorUsuario.get(usuarioId).add(libroId);
+
+    respuesta.status(204).send();
+  } catch (error) {
+    console.error("Error al eliminar el libro:", error);
+    respuesta
+      .status(500)
+      .json({ message: "Error al eliminar el libro", error });
   }
-
-  if (!librosEliminadosPorUsuario.has(usuarioId)) {
-    librosEliminadosPorUsuario.set(usuarioId, new Set());
-  }
-
-  librosEliminadosPorUsuario.get(usuarioId).add(libroId);
-
-  respuesta.status(204).send();
 };
 
 module.exports = { buscarLibros, obtenerLibros, eliminarLibro };

@@ -1,10 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { useUsuario } from "./contextoUsuario";
 
 const ListasContexto = createContext();
 
 export const useListas = () => useContext(ListasContexto);
 
 export const ListasProvider = ({ children }) => {
+  const { usuario: dataUsuario } = useUsuario();
   const [listas, setListas] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false);
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
@@ -15,9 +17,10 @@ export const ListasProvider = ({ children }) => {
   const [librosGuardados, setLibrosGuardados] = useState([]);
 
   useEffect(() => {
-    console.log("useEffect para obtener listas ejecutado");
-    obtenerListas();
-  }, []);
+    if (dataUsuario && dataUsuario._id) {
+      obtenerListas();
+    }
+  }, [dataUsuario]);
 
   useEffect(() => {
     console.log("useEffect para actualizar libros ejecutado");
@@ -40,7 +43,9 @@ export const ListasProvider = ({ children }) => {
 
   const obtenerListas = async () => {
     setCargandoListas(true);
-    const usuarioId = "66b48c81d6db946021330d9a";
+    const usuarioId = dataUsuario._id;
+    console.log("usuarioId en contextoListas:", usuarioId);
+
     try {
       const respuesta = await fetch(
         `http://localhost:3000/api/listas/${usuarioId}`,
@@ -54,6 +59,7 @@ export const ListasProvider = ({ children }) => {
       const data = await respuesta.json();
       console.log("Listas obtenidas contexto:", data);
       setListas(data);
+
       const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
       if (listaMeGusta) {
         setLibrosFavoritos(listaMeGusta.libros);
@@ -76,7 +82,9 @@ export const ListasProvider = ({ children }) => {
   };
 
   const agregarLibroALista = async (listaId, libro, libroId) => {
-    console.log("Agregar libro a lista:", { listaId, libro, libroId});
+    const usuarioId = dataUsuario._id;
+    console.log("Agregar libro a lista:", { listaId, libro, libroId, usuarioId });
+
     try {
       const respuesta = await fetch(
         `http://localhost:3000/api/listas/${listaId}/libros`,
@@ -86,7 +94,7 @@ export const ListasProvider = ({ children }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            usuarioId: "66b48c81d6db946021330d9a",
+            usuarioId,
             libroId: libro.id || libro._id,
           }),
         }
@@ -106,7 +114,8 @@ export const ListasProvider = ({ children }) => {
   };
 
   const eliminarLibroDeLista = async (listaId, libroId) => {
-    const usuarioId = "66b48c81d6db946021330d9a";
+    const usuarioId = dataUsuario._id;
+
     try {
       const respuesta = await fetch(
         `http://localhost:3000/api/listas/${usuarioId}/${listaId}/libros/${libroId}`,
@@ -128,9 +137,11 @@ export const ListasProvider = ({ children }) => {
   };
 
   const eliminarLista = async (listaId) => {
+    const usuarioId = dataUsuario._id;
+
     try {
       const respuesta = await fetch(
-        `http://localhost:3000/api/listas/${listaId}`,
+        `http://localhost:3000/api/listas/${usuarioId}/${listaId}`,
         {
           method: "DELETE",
           headers: {
@@ -199,7 +210,7 @@ export const ListasProvider = ({ children }) => {
       .map((lista) => lista._id);
 
     setListasSeleccionadas(listasQueContienenElLibro);
-    console.log("listasSeleccionadas contextoListas:",listasSeleccionadas)
+    console.log("listasSeleccionadas contextoListas:", listasSeleccionadas);
   };
 
   const cerrarPopupLista = () => {
@@ -208,11 +219,17 @@ export const ListasProvider = ({ children }) => {
   };
 
   const handleCambioCheckbox = (listaId) => {
-    console.log("listaId en contextoListas", listaId)
-    console.log("listasSeleccionadas en handleCambioCheckbox antes de cambiar valor:", listasSeleccionadas)
+    console.log("listaId en contextoListas", listaId);
+    console.log(
+      "listasSeleccionadas en handleCambioCheckbox antes de cambiar valor:",
+      listasSeleccionadas
+    );
     setListasSeleccionadas((prev) => {
       if (prev.includes(listaId)) {
-        console.log("listasSeleccionadas en handleCambioCheckbox después de cambiar valor:", listasSeleccionadas)
+        console.log(
+          "listasSeleccionadas en handleCambioCheckbox después de cambiar valor:",
+          listasSeleccionadas
+        );
         return prev.filter((id) => id !== listaId);
       } else {
         return [...prev, listaId];
@@ -253,7 +270,10 @@ export const ListasProvider = ({ children }) => {
       }
 
       await obtenerListas();
-      console.log("Libros guardados después de obtener listas:", librosGuardados);
+      console.log(
+        "Libros guardados después de obtener listas:",
+        librosGuardados
+      );
       if (listasParaEliminar.length > 0) {
         mensaje += "El libro ha sido eliminado correctamente de las listas.";
       }

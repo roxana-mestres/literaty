@@ -1,10 +1,9 @@
-import { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import estilosIniciarSesion from "../../estilos/IniciarSesion.module.css";
 import estilos from "../../estilos/Comunes.module.css";
 
 function ComponenteIniciarSesion() {
-  const navegar = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -33,7 +32,7 @@ function ComponenteIniciarSesion() {
       if (data.message === "Inicio de sesión exitoso") {
         setError("");
         setExito(true);
-        navegar("/perfil");
+        window.location.href = '/perfil';
       } else {
         console.error("Error al iniciar sesión:", data.message);
         setError(data.message);

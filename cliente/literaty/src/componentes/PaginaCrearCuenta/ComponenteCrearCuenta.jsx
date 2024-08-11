@@ -16,7 +16,6 @@ const ComponenteCrearCuenta = () => {
   const [contrasenaVisible, setContrasenaVisible] = useState(false);
   const [repetirContrasenaVisible, setRepetirContrasenaVisible] =
     useState(false);
-  const [mostrarRequisitos, setMostrarRequisitos] = useState(false);
   const imagenesAvatar = [avatar1, avatar2, avatar3, avatar4, avatar5];
   const [formData, setFormData] = useState({
     nombre: "",
@@ -109,9 +108,8 @@ const ComponenteCrearCuenta = () => {
     if (respuesta.ok && data.message === "Usuario creado exitosamente") {
       setExito(true);
       setError("");
-      console.log(
-        "Cuenta creada con éxito. Redirigiendo a la página de inicio de sesión..."
-      );
+      console.log("Cuenta creada con éxito. Redirigiendo a la página de inicio de sesión...");
+      console.log("Llamando a la función de navegación...");
       navegar("/iniciar-sesion");
     } else {
       setExito(false);
