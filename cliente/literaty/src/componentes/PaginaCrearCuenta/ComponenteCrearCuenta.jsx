@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import estilos from "../../estilos/Comunes.module.css";
 import estiloCrearCuenta from "../../estilos/CrearCuenta.module.css";
 import avatar1 from "../../assets/avatar-1.svg";
@@ -9,7 +8,6 @@ import avatar4 from "../../assets/avatar-4.svg";
 import avatar5 from "../../assets/avatar-5.svg";
 
 const ComponenteCrearCuenta = () => {
-  const navegar = useNavigate();
   const [exito, setExito] = useState(false);
   const [error, setError] = useState("");
   const [indiceAvatar, setIndiceAvatar] = useState(0);
@@ -47,13 +45,11 @@ const ComponenteCrearCuenta = () => {
     setRepetirContrasenaVisible((prevVisible) => !prevVisible);
   };
 
-  const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
+  const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d])[a-zA-Z\d\w\W]{8,}$/;
 
-  const validarContrasena = (password) => {
-    return regexContrasena.test(password);
-  };
-
-  
+const validarContrasena = (password) => {
+  return regexContrasena.test(password);
+};  
 
   const validarCorreo = (email) => {
     return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,3}$/.test(email);
@@ -72,19 +68,16 @@ const ComponenteCrearCuenta = () => {
       return;
     }
 
-    // Validar correo electrónico
     if (!validarCorreo(formData.email)) {
       alert("Correo electrónico no válido.");
       return;
     }
 
-    // Validar que las contraseñas coincidan
     if (formData.password !== formData.repetirPassword) {
       alert("Las contraseñas no coinciden.");
       return;
     }
 
-    // Validar contraseña
     if (!validarContrasena(formData.password)) {
       alert(
         "La contraseña debe incluir al menos 8 caracteres, 1 número y 1 símbolo."
@@ -105,15 +98,15 @@ const ComponenteCrearCuenta = () => {
       body: JSON.stringify(usuario),
     });
     const data = await respuesta.json();
-    if (respuesta.ok && data.message === "Usuario creado exitosamente") {
+    if (respuesta.ok && data.message === "Cuenta creada exitosamente") {
       setExito(true);
       setError("");
       console.log("Cuenta creada con éxito. Redirigiendo a la página de inicio de sesión...");
       console.log("Llamando a la función de navegación...");
-      navegar("/iniciar-sesion");
+      window.location.href = '/iniciar-sesion';
     } else {
       setExito(false);
-      setError(data.error);
+      setError(data.message || "Error desconocido");
       console.error(`Error al crear la cuenta: ${JSON.stringify(data)}`);
     }
   };

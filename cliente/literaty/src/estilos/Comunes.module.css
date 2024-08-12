@@ -140,21 +140,11 @@ a {
 
 @media screen and (min-width: 651px) and (max-width: 1020px) {
   .material-icons-outlined {
-    font-family: "Material Icons Outlined";
-    font-size: 1.2em;
-    vertical-align: middle;
-    margin-left: 5px;
-    cursor: pointer;
     color: #595959;
   }
 
   @media screen and (min-width: 1021px) {
     .material-icons-outlined {
-      font-family: "Material Icons Outlined";
-      font-size: 1.2em;
-      vertical-align: middle;
-      margin-left: 5px;
-      cursor: pointer;
       color: #f4e5e0;
     }
   }

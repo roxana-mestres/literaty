@@ -136,6 +136,15 @@ input[name="nombre"] {
   display: none;
 }
 
+@media only screen and (min-width: 1025px) {
+  input.form{
+    color: #f4e5e0;
+  }
+  input.form::placeholder{
+    color: #f4e5e0;
+  }
+}
+
 @media only screen and (min-width: 676px) and (max-width: 1024px) {
   .body-crear-cuenta {
     background-image: url(../assets/crearCuentaImgDer.svg);
