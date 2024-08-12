@@ -34,7 +34,7 @@
   background-size: 50%;
   background-position: right 10% top 20%;
   width: 80vw;
-  height: auto;
+  height: 90vh;
 }
 
 .avatar-contenedor {
@@ -60,14 +60,13 @@
 
 .div-tarjeta {
   width: 100%;
-  height: auto;
+  height: 75vh;
   border: 3px dotted #252627;
   border-radius: 5px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   align-content: space-between;
   text-align: left;
-  margin-top: 20px;
 }
 
 /* Estilos para las celdas */
@@ -75,7 +74,6 @@
   width: 100%;
   height: auto;
   display: flex;
-  align-items: center;
   justify-content: flex-start;
   padding: 10px;
 }
@@ -87,6 +85,13 @@
 .celda-tres {
   border-top: 3px dotted #252627;
   border-bottom: 3px dotted #252627;
+  width: 100%;
+}
+
+.nombre {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .celda-cuatro {
@@ -97,7 +102,6 @@
 .celda-tres div,
 .celda-seis div {
   display: flex;
-  align-items: center;
   justify-content: flex-start;
 }
 
@@ -117,6 +121,7 @@
 
 .correo {
   width: 100%;
+  display: flex;
 }
 
 .correo input {
@@ -139,19 +144,11 @@
   float: right;
 }
 
-.boton-actualizar {
-  margin-right: 20px;
-}
-
-.boton-actualizar-dos {
-  display: none;
-}
-
 input {
   color: #252627;
 }
 
-.celda input{
+.celda input {
   width: 200px;
 }
 
@@ -178,16 +175,13 @@ input {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: auto;
 }
 
 .celda p b {
   display: inline-block;
   margin-right: 15px;
   white-space: nowrap;
-}
-
-.div-contrasenas {
-  margin-bottom: 10px;
 }
 
 .celda-seis {
@@ -198,21 +192,22 @@ input {
 
 .correo {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: flex-start;
   width: 100%;
 }
 
 .correo p {
   margin-right: 10px;
+  padding-left: 16px;
+}
+
+.nombre p, div.div-contrasenas{
+  padding-left: 16px;
 }
 
 .correo input {
   flex: 1;
-}
-
-.boton-actualizar {
-  margin-left: 20px;
 }
 
 @media screen and (max-width: 767px) {
@@ -241,11 +236,24 @@ input {
     justify-content: flex-start;
     align-items: left;
   }
-  .boton-actualizar {
-    display: none;
+
+}
+
+@media screen and (min-width: 320px) and (max-width: 1000px){
+  div.div-contrasenas {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  .boton-actualizar-dos {
-    display: block;
-    margin-left: 10px;
+  div.input-container {
+    width: 100%;
+  }
+
+  .cuerpo-editar-perfil {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  .celda-ancho-completo {
+    align-items: flex-start;
   }
 }

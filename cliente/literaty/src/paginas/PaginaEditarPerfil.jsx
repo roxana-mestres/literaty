@@ -106,7 +106,9 @@ function PaginaEditarPerfil() {
       if (!respuesta.ok) {
         const errorData = await respuesta.json();
         console.log("Respuesta no OK:", errorData);
-        throw new Error(errorData.mensaje || "Error al actualizar la contraseña");
+        throw new Error(
+          errorData.mensaje || "Error al actualizar la contraseña"
+        );
       }
 
       setContrasena("");
@@ -122,7 +124,8 @@ function PaginaEditarPerfil() {
   };
 
   const validarContrasena = (password) => {
-    const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
+    const regexContrasena =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
     const esValida = regexContrasena.test(password);
     console.log("Contraseña válida:", esValida);
     return esValida;
@@ -152,7 +155,7 @@ function PaginaEditarPerfil() {
       <div
         className={`${estilosEditarPerfil["celda"]} ${estilosEditarPerfil["celda-tres"]}`}
       >
-        <div>
+        <div className={`${estilosEditarPerfil["nombre"]}`}>
           <p>
             <b>Nombre:</b>
           </p>
@@ -185,7 +188,7 @@ function PaginaEditarPerfil() {
       >
         <div className={`${estilosEditarPerfil["div-contrasenas-container"]}`}>
           <div className={`${estilosEditarPerfil["div-contrasenas"]}`}>
-            <p>
+            <p className={`${estilosEditarPerfil["p-contrasena"]}`}>
               <b>Contraseña actual:</b>
             </p>
             <div className={`${estilosEditarPerfil["input-container"]}`}>
@@ -199,7 +202,9 @@ function PaginaEditarPerfil() {
                 onClick={toggleMostrarContrasena}
                 className={estilosEditarPerfil["mostrar-contrasena"]}
               >
-                {mostrarContrasena ? "Ocultar" : "Mostrar"}
+                <span className="material-symbols-outlined">
+                  {mostrarContrasena ? "visibility_off" : "visibility"}
+                </span>
               </button>
             </div>
           </div>
@@ -218,7 +223,9 @@ function PaginaEditarPerfil() {
                 onClick={toggleMostrarContrasena}
                 className={estilosEditarPerfil["mostrar-contrasena"]}
               >
-                {mostrarContrasena ? "Ocultar" : "Mostrar"}
+                <span className="material-symbols-outlined">
+                  {mostrarContrasena ? "visibility_off" : "visibility"}
+                </span>
               </button>
             </div>
           </div>
@@ -237,17 +244,13 @@ function PaginaEditarPerfil() {
                 onClick={toggleMostrarContrasena}
                 className={estilosEditarPerfil["mostrar-contrasena"]}
               >
-                {mostrarContrasena ? "Ocultar" : "Mostrar"}
+                <span className="material-symbols-outlined">
+                  {mostrarContrasena ? "visibility_off" : "visibility"}
+                </span>
               </button>
             </div>
           </div>
         </div>
-        <button
-          className={`${estilos["boton"]} ${estilosEditarPerfil["boton-actualizar"]}`}
-          onClick={handleActualizarContrasena}
-        >
-          Actualizar
-        </button>
       </div>
     </div>
   );

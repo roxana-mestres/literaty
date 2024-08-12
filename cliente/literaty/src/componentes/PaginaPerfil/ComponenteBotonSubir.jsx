@@ -21,7 +21,8 @@ function BotonSubir(props) {
     };
   }, []);
 
-  const manejarSubirArriba = () => {
+  const manejarSubirArriba = (e) => {
+    e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

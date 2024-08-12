@@ -8,7 +8,6 @@
   margin-bottom: -10px;
   margin-right: 20px;
 }
-
 .cargando {
   position: fixed;
   top: 50%;
@@ -50,6 +49,8 @@ div.divAvatarBuscadorNotas {
   align-items: center;
   padding-top: 20px;
 }
+
+
 /*ITEM LIBRO*/
 .portada-libro {
   min-width: 128px;
@@ -204,5 +205,17 @@ div.div-sobre-footer {
   }
   div.buscador {
     width: 80vw;
+    margin-top: 50px;
+  }
+  div.divAvatarBuscadorNotas {
+    flex-direction: column;
+  }
+  h3.h3-notas{
+    font-size: 1.5em;
+  }
+  .seccion-libros-grid{
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
   }
 }
