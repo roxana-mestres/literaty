@@ -19,8 +19,11 @@ export const ListasProvider = ({ children }) => {
   const [librosGuardados, setLibrosGuardados] = useState([]);
 
   useEffect(() => {
+    console.log("Verificando dataUsuario en ListasProvider:", dataUsuario);
     if (dataUsuario && dataUsuario._id) {
       obtenerListas();
+    } else {
+      console.log("dataUsuario no está disponible o no tiene un _id válido.");
     }
   }, [dataUsuario]);
 
@@ -46,7 +49,8 @@ export const ListasProvider = ({ children }) => {
   const obtenerListas = async () => {
     setCargandoListas(true);
     const usuarioId = dataUsuario._id;
-  
+    console.log("Intentando obtener listas para el usuario:", usuarioId);
+    
     try {
       let respuesta = await fetch(
         `http://localhost:3000/api/listas/${usuarioId}`,
@@ -59,9 +63,13 @@ export const ListasProvider = ({ children }) => {
         }
       );
   
+      console.log("Respuesta inicial de la API:", respuesta);
+  
       if (respuesta.status === 401) {
+        console.log("Token expirado, intentando renovar...");
         const tokenRenovado = await renovarToken();
         if (tokenRenovado) {
+          console.log("Token renovado exitosamente. Reintentando obtener listas.");
           respuesta = await fetch(
             `http://localhost:3000/api/listas/${usuarioId}`,
             {
@@ -82,6 +90,7 @@ export const ListasProvider = ({ children }) => {
       }
   
       const data = await respuesta.json();
+      console.log("Listas obtenidas:", data);
       setListas(data);
   
       const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
@@ -99,7 +108,7 @@ export const ListasProvider = ({ children }) => {
     } finally {
       setCargandoListas(false);
     }
-  };  
+  };
 
   const agregarLibroALista = async (listaId, libro, libroId) => {
     const usuarioId = dataUsuario._id;

@@ -172,7 +172,7 @@ ComponenteItemLibro.propTypes = {
     image: PropTypes.string,
     description: PropTypes.string,
   }).isRequired,
-  context: PropTypes.oneOf(["perfil", "listas"]).isRequired,
+  context: PropTypes.oneOf(["perfil", "listas"]),
 };
 
 export default ComponenteItemLibro;

@@ -419,6 +419,7 @@ function ComponenteListas() {
         <ComponentePopupListas
           libro={libroSeleccionado}
           onClose={cerrarPopupLista}
+          listas={listasDeLibros} 
         />
       )}
     </>

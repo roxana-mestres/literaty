@@ -32,25 +32,6 @@ export const AuthProvider = ({ children }) => {
     verificarAutenticacion();
   }, []);
 
-  const refrescarToken = async () => {
-    try {
-      const respuesta = await fetch("http://localhost:3000/api/refresh-token", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (respuesta.ok) {
-        const data = await respuesta.json();
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.error("Error al refrescar el token:", error);
-      return false;
-    }
-  };
-
   const iniciarSesion = (token) => {
     setIsAuthenticated(true);
   };
