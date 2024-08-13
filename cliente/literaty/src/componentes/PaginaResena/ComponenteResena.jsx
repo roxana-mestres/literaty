@@ -23,14 +23,19 @@ function ComponenteResena() {
   } = useListas();
   const { handleEliminarLibro } = useLibros();
   const location = useLocation();
-  const navegar = useNavigate();
+  const navigate = useNavigate();
   const { libro, context, indiceSeleccionado } = location.state || {};
 
   if (!libro) {
     return <div>No se ha encontrado la información del libro.</div>;
   }
 
-  const textoCompleto = libro?.description || "Descripción no disponible.";
+  // Función para remover etiquetas HTML
+  function eliminarEtiquetasHTML(texto) {
+    return texto.replace(/<\/?[^>]+(>|$)/g, "");
+  }
+
+  const textoCompleto = eliminarEtiquetasHTML(libro?.description || "Descripción no disponible.");
   const limitePalabras = 100;
   const palabras = textoCompleto.split(" ");
   const textoResumido = palabras.slice(0, limitePalabras).join(" ");
@@ -50,20 +55,14 @@ function ComponenteResena() {
 
     if (context === "perfil") {
       handleEliminarLibro(libroId);
-      navegar("/perfil");
+      navigate("/perfil");
     } else if (context === "listas") {
       if (!indiceSeleccionado) {
         console.error("Error: No se ha seleccionado una lista actual.");
         return;
       }
-      console.log(
-        "Eliminando libro:",
-        libroId,
-        "de la lista:",
-        indiceSeleccionado
-      );
       eliminarLibroDeLista(indiceSeleccionado, libroId);
-      navegar(`/listas`);
+      navigate(`/listas`, { state: { indiceSeleccionado } });
     } else {
       console.error("Error: Contexto no válido.");
     }
@@ -72,20 +71,27 @@ function ComponenteResena() {
   const handleFavoriteClick = () => {
     const obtenerIdLibro = (libro) => libro._id || libro.id;
     const libroId = obtenerIdLibro(libro);
-    handleHeartClick(libroId); 
+    handleHeartClick(libroId);
+  };
+
+  const handleArrowBackClick = () => {
+    if (context === "listas" && indiceSeleccionado !== undefined) {
+      navigate("/listas", { state: { indiceSeleccionado } });
+    } else {
+      navigate("/perfil");
+    }
   };
 
   return (
     <>
       <div className={resena["div-flecha-itemlibro"]}>
-        <Link to="/perfil">
-          <span
-            className={`${estilos["material-icons-outlined"]} ${resena["flecha-resena"]}`}
-            style={{ color: "#252627", fontSize: "42px" }}
-          >
-            arrow_back
-          </span>
-        </Link>
+        <span
+          className={`${estilos["material-icons-outlined"]} ${resena["flecha-resena"]}`}
+          style={{ color: "#252627", fontSize: "42px", cursor: "pointer" }}
+          onClick={handleArrowBackClick}
+        >
+          arrow_back
+        </span>
         <ItemLibro
           className={resena["itemlibro"]}
           libro={libro}
