@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const verificarAutenticacion = async () => {
       try {
         const respuesta = await fetch("http://localhost:3000/api/verificar-token", {
           method: "GET",
@@ -16,6 +16,9 @@ export const AuthProvider = ({ children }) => {
 
         if (respuesta.ok) {
           setIsAuthenticated(true);
+        } else if (respuesta.status === 401) {
+          const refrescoExitoso = await refrescarToken();
+          setIsAuthenticated(refrescoExitoso);
         } else {
           setIsAuthenticated(false);
         }
@@ -26,8 +29,27 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    checkAuth();
+    verificarAutenticacion();
   }, []);
+
+  const refrescarToken = async () => {
+    try {
+      const respuesta = await fetch("http://localhost:3000/api/refresh-token", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (respuesta.ok) {
+        const data = await respuesta.json();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error al refrescar el token:", error);
+      return false;
+    }
+  };
 
   const iniciarSesion = (token) => {
     setIsAuthenticated(true);
@@ -37,8 +59,26 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  const renovarToken = async () => {
+    try {
+      const respuesta = await fetch("http://localhost:3000/api/renovar-token", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (respuesta.ok) {
+        return true;
+      } else {
+        throw new Error("No se pudo renovar el token.");
+      }
+    } catch (error) {
+      console.error("Error al renovar el token:", error);
+      return false;
+    }
+  };
+
   return (
-    <AuthContexto.Provider value={{ isAuthenticated, iniciarSesion, cerrarSesion, cargando }}>
+    <AuthContexto.Provider value={{ isAuthenticated, iniciarSesion, cerrarSesion, cargando, renovarToken}}>
       {children}
     </AuthContexto.Provider>
   );

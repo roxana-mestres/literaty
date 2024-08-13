@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useUsuario } from "./contextoUsuario";
+import { AuthContexto } from "./contextoAuth";
 
 const ListasContexto = createContext();
 
@@ -7,6 +8,7 @@ export const useListas = () => useContext(ListasContexto);
 
 export const ListasProvider = ({ children }) => {
   const { usuario: dataUsuario } = useUsuario();
+  const { renovarToken } = useContext(AuthContexto);
   const [listas, setListas] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false);
   const [libroSeleccionado, setLibroSeleccionado] = useState(null);
@@ -44,42 +46,60 @@ export const ListasProvider = ({ children }) => {
   const obtenerListas = async () => {
     setCargandoListas(true);
     const usuarioId = dataUsuario._id;
-    console.log("usuarioId en contextoListas:", usuarioId);
-
+  
     try {
-      const respuesta = await fetch(
+      let respuesta = await fetch(
         `http://localhost:3000/api/listas/${usuarioId}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
         }
       );
+  
+      if (respuesta.status === 401) {
+        const tokenRenovado = await renovarToken();
+        if (tokenRenovado) {
+          respuesta = await fetch(
+            `http://localhost:3000/api/listas/${usuarioId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+            }
+          );
+        } else {
+          throw new Error("Error al renovar el token.");
+        }
+      }
+  
+      if (!respuesta.ok) {
+        throw new Error('Error al obtener listas');
+      }
+  
       const data = await respuesta.json();
-      console.log("Listas obtenidas contexto:", data);
       setListas(data);
-
+  
       const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
       if (listaMeGusta) {
         setLibrosFavoritos(listaMeGusta.libros);
       }
-
+  
       const librosEnGuardados = data
         .filter((lista) => lista.nombre !== "Me gusta")
         .flatMap((lista) => lista.libros);
-
+  
       setLibrosGuardados(librosEnGuardados);
-
-      console.log(
-        "Libros guardados después de obtener listas:",
-        librosEnGuardados
-      );
     } catch (error) {
       console.error("Error al obtener listas:", error);
+    } finally {
+      setCargandoListas(false);
     }
-    setCargandoListas(false);
-  };
+  };  
 
   const agregarLibroALista = async (listaId, libro, libroId) => {
     const usuarioId = dataUsuario._id;

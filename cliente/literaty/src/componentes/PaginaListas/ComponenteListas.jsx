@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useListas } from "../../contextos/contextoListas";
 import { useUsuario } from "../../contextos/contextoUsuario";
+import { AuthContexto } from "../../contextos/contextoAuth";
 import { Link } from "react-router-dom";
 import estilos from "../../estilos/Comunes.module.css";
 import resena from "../../estilos/PaginaResena.module.css";
@@ -20,6 +21,7 @@ const iconosLibros = [
 
 function ComponenteListas() {
   const { usuario: dataUsuario } = useUsuario();
+  const { renovarToken } = useContext(AuthContexto);
   const [listasDeLibros, setListasDeLibros] = useState([]);
   const [librosDeLista, setLibrosDeLista] = useState([]);
   const [indiceSeleccionado, setIndiceSeleccionado] = useState(null);
@@ -27,52 +29,72 @@ function ComponenteListas() {
   const { librosFavoritos, popupVisible, cerrarPopupLista, libroSeleccionado } =
     useListas();
 
-    const usuarioId = dataUsuario._id;
+  const usuarioId = dataUsuario?._id;
 
-    useEffect(() => {
-      const fetchListas = async () => {
-        try {
-          console.log(`Fetching listas for usuarioId: ${usuarioId}`);
-          const respuesta = await fetch(`http://localhost:3000/api/listas/${usuarioId}`);
-          console.log("Respuesta fetch:", respuesta);
-          if (!respuesta.ok) {
-            throw new Error("Error al obtener las listas");
-          }
-          let data = await respuesta.json();
-          console.log("Listas obtenidas:", data);
-  
-          data = data.map((lista, index) => ({
-            ...lista,
-            icono: lista.icono || iconosLibros[index % iconosLibros.length],
-          }));
-  
-          setListasDeLibros(data);
-  
-          const almacenadoIndice = localStorage.getItem("indiceSeleccionado");
-          if (almacenadoIndice) {
-            const listaSeleccionada = data.find(
-              (lista) => lista._id === almacenadoIndice
-            );
-            if (listaSeleccionada) {
-              manejarClickLista(listaSeleccionada._id);
-            }
-          } else {
-            const listaMeGusta = data.find(
-              (lista) => lista.nombre === "Me gusta"
-            );
-            if (listaMeGusta) {
-              manejarClickLista(listaMeGusta._id);
-            }
-          }
-        } catch (error) {
-          console.error("Error al obtener las listas:", error);
+  const manejarErrorYReintentar = async (funcion, ...params) => {
+    try {
+      return await funcion(...params);
+    } catch (error) {
+      if (error.message.includes("401")) {
+        const tokenRenovado = await renovarToken();
+        if (tokenRenovado) {
+          return funcion(...params);
+        } else {
+          throw new Error("No se pudo renovar el token.");
         }
-      };
-  
-      if (usuarioId) { 
-        fetchListas();
+      } else {
+        throw error;
       }
-    }, [usuarioId, librosFavoritos]);
+    }
+  };
+
+  useEffect(() => {
+    const fetchListas = async () => {
+      try {
+        console.log(`Fetching listas for usuarioId: ${usuarioId}`);
+        const respuesta = await manejarErrorYReintentar(
+          async () => await fetch(`http://localhost:3000/api/listas/${usuarioId}`)
+        );
+
+        if (!respuesta.ok) {
+          throw new Error("Error al obtener las listas");
+        }
+
+        let data = await respuesta.json();
+        console.log("Listas obtenidas:", data);
+
+        data = data.map((lista, index) => ({
+          ...lista,
+          icono: lista.icono || iconosLibros[index % iconosLibros.length],
+        }));
+
+        setListasDeLibros(data);
+
+        const almacenadoIndice = localStorage.getItem("indiceSeleccionado");
+        if (almacenadoIndice) {
+          const listaSeleccionada = data.find(
+            (lista) => lista._id === almacenadoIndice
+          );
+          if (listaSeleccionada) {
+            manejarClickLista(listaSeleccionada._id);
+          }
+        } else {
+          const listaMeGusta = data.find(
+            (lista) => lista.nombre === "Me gusta"
+          );
+          if (listaMeGusta) {
+            manejarClickLista(listaMeGusta._id);
+          }
+        }
+      } catch (error) {
+        console.error("Error al obtener las listas:", error);
+      }
+    };
+
+    if (usuarioId) { 
+      fetchListas();
+    }
+  }, [usuarioId, librosFavoritos]);
 
   const agregarLista = async () => {
     try {
@@ -87,18 +109,20 @@ function ComponenteListas() {
 
       console.log("Enviando solicitud para crear lista con datos:", nuevaLista);
 
-      const respuesta = await fetch(
-        `http://localhost:3000/api/agregar-lista/${usuarioId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nombre: nuevaLista.nombre,
-            usuarioId: usuarioId,
-          }),
-        }
+      const respuesta = await manejarErrorYReintentar(
+        async () => await fetch(
+          `http://localhost:3000/api/agregar-lista/${usuarioId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              nombre: nuevaLista.nombre,
+              usuarioId: usuarioId,
+            }),
+          }
+        )
       );
 
       console.log("Respuesta de la solicitud:", respuesta);
@@ -124,11 +148,13 @@ function ComponenteListas() {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta lista?")) {
       console.log("ID de la lista a eliminar:", listaId);
       try {
-        const respuesta = await fetch(
-          `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
-          {
-            method: "DELETE",
-          }
+        const respuesta = await manejarErrorYReintentar(
+          async () => await fetch(
+            `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
+            {
+              method: "DELETE",
+            }
+          )
         );
 
         console.log("Respuesta de la solicitud de eliminación:", respuesta);
@@ -175,15 +201,17 @@ function ComponenteListas() {
     const nuevoNombre = lista.nombre;
 
     try {
-      const respuesta = await fetch(
-        `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ nombre: nuevoNombre }),
-        }
+      const respuesta = await manejarErrorYReintentar(
+        async () => await fetch(
+          `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ nombre: nuevoNombre }),
+          }
+        )
       );
 
       if (!respuesta.ok) {
@@ -226,7 +254,9 @@ function ComponenteListas() {
       const url = `http://localhost:3000/api/obtener-libros/${usuarioId}/${listaId}`;
       console.log(`URL de la solicitud: ${url}`);
 
-      const respuesta = await fetch(url);
+      const respuesta = await manejarErrorYReintentar(
+        async () => await fetch(url)
+      );
 
       console.log("Respuesta del fetch:", respuesta);
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import estilosEditarPerfil from "../estilos/EditarPerfil.module.css";
 import estilos from "../estilos/Comunes.module.css";
 import ComponenteEditarPerfil from "../componentes/PaginaEditarPerfil/ComponenteEditarPerfil";
 import { useUsuario } from "../contextos/contextoUsuario";
+import {AuthContexto} from "../contextos/contextoAuth";
 import avatar0 from "../assets/avatar-0.svg";
 import avatar1 from "../assets/avatar-1.svg";
 import avatar2 from "../assets/avatar-2.svg";
@@ -13,6 +14,7 @@ import avatar5 from "../assets/avatar-5.svg";
 function PaginaEditarPerfil() {
   const { usuario: dataUsuario, actualizarDataUsuario } = useUsuario();
   console.log("Estos son los datos del usuario - dataUsuario: ", dataUsuario);
+  const { renovarToken } = useContext(AuthContexto);
   const titulo = "Editar perfil";
   const [contrasenaActual, setContrasenaActual] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -22,7 +24,6 @@ function PaginaEditarPerfil() {
   const avatares = [avatar0, avatar1, avatar2, avatar3, avatar4, avatar5];
   const [nombreOriginal, setNombreOriginal] = useState(dataUsuario.nombre);
   const [emailOriginal, setEmailOriginal] = useState(dataUsuario.email);
-  const [alertas, setAlertas] = useState([]); 
 
   useEffect(() => {
     setIndiceAvatar(dataUsuario.avatar || 0);
@@ -43,85 +44,131 @@ function PaginaEditarPerfil() {
   const handleGuardarCambios = async () => {
     const usuarioId = dataUsuario._id;
     const nuevasAlertas = [];
-
+  
     if (dataUsuario.nombre !== nombreOriginal || dataUsuario.email !== emailOriginal) {
-        nuevasAlertas.push("Los cambios en el perfil han sido guardados correctamente.");
+      nuevasAlertas.push("Los cambios en el perfil han sido guardados correctamente.");
     }
-
+  
     if (contrasena && contrasenaActual && contrasena === contrasenaRepetida) {
-        const contrasenaValida = validarContrasena(contrasena);
-        if (!contrasenaValida) {
-            alert("La nueva contraseña no cumple con los requisitos.");
-            return;
-        }
-
-        try {
-            const respuestaContrasena = await fetch(
-                `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        contrasenaActual,
-                        contrasena,
-                    }),
-                }
-            );
-
-            if (!respuestaContrasena.ok) {
-                const errorData = await respuestaContrasena.json();
-                throw new Error(
-                    errorData.mensaje || "Error al actualizar la contraseña"
-                );
-            }
-
-            nuevasAlertas.push("La contraseña ha sido actualizada correctamente.");
-        } catch (error) {
-            console.error("Error al actualizar la contraseña:", error);
-            alert("Hubo un problema al actualizar la contraseña.");
-            return;
-        }
-
-        setContrasena("");
-        setContrasenaRepetida("");
-        setContrasenaActual("");
-    }
-
-    try {
-        const respuestaPerfil = await fetch(
-            `http://localhost:3000/api/usuario/actualizar/${usuarioId}`,
-            {
+      const contrasenaValida = validarContrasena(contrasena);
+      if (!contrasenaValida) {
+        alert("La nueva contraseña no cumple con los requisitos.");
+        return;
+      }
+  
+      try {
+        let respuestaContrasena = await fetch(
+          `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contrasenaActual,
+              contrasena,
+            }),
+            credentials: "include",
+          }
+        );
+  
+        if (respuestaContrasena.status === 401) {
+          const tokenRenovado = await renovarToken();
+          if (tokenRenovado) {
+            respuestaContrasena = await fetch(
+              `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
+              {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json",
+                  "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    ...dataUsuario,
-                    avatar: indiceAvatar,
+                  contrasenaActual,
+                  contrasena,
                 }),
-            }
-        );
-
-        if (!respuestaPerfil.ok) {
-            throw new Error("Error al actualizar el usuario");
+                credentials: "include",
+              }
+            );
+          } else {
+            alert("Error al renovar el token. Por favor, inicie sesión nuevamente.");
+            return;
+          }
         }
-
-        const usuarioActualizado = await respuestaPerfil.json();
-        actualizarDataUsuario(usuarioActualizado);
-        setNombreOriginal(usuarioActualizado.nombre);
-        setEmailOriginal(usuarioActualizado.email);
-    } catch (error) {
-        console.error("Error al actualizar el usuario:", error);
-        alert("Hubo un problema al actualizar el perfil.");
+  
+        if (!respuestaContrasena.ok) {
+          const errorData = await respuestaContrasena.json();
+          throw new Error(errorData.mensaje || "Error al actualizar la contraseña");
+        }
+  
+        nuevasAlertas.push("La contraseña ha sido actualizada correctamente.");
+      } catch (error) {
+        console.error("Error al actualizar la contraseña:", error);
+        alert("Hubo un problema al actualizar la contraseña.");
         return;
+      }
+  
+      setContrasena("");
+      setContrasenaRepetida("");
+      setContrasenaActual("");
     }
-
+  
+    try {
+      let respuestaPerfil = await fetch(
+        `http://localhost:3000/api/usuario/actualizar/${usuarioId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...dataUsuario,
+            avatar: indiceAvatar,
+          }),
+          credentials: "include",
+        }
+      );
+  
+      if (respuestaPerfil.status === 401) {
+        const tokenRenovado = await renovarToken();
+        if (tokenRenovado) {
+          respuestaPerfil = await fetch(
+            `http://localhost:3000/api/usuario/actualizar/${usuarioId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                ...dataUsuario,
+                avatar: indiceAvatar,
+              }),
+              credentials: "include",
+            }
+          );
+        } else {
+          alert("Error al renovar el token. Por favor, inicie sesión nuevamente.");
+          return;
+        }
+      }
+  
+      if (!respuestaPerfil.ok) {
+        throw new Error("Error al actualizar el usuario");
+      }
+  
+      const usuarioActualizado = await respuestaPerfil.json();
+      actualizarDataUsuario(usuarioActualizado);
+      setNombreOriginal(usuarioActualizado.nombre);
+      setEmailOriginal(usuarioActualizado.email);
+    } catch (error) {
+      console.error("Error al actualizar el usuario:", error);
+      alert("Hubo un problema al actualizar el perfil.");
+      return;
+    }
+  
     if (nuevasAlertas.length > 0) {
-        alert(nuevasAlertas.join("\n"));
+      alert(nuevasAlertas.join("\n"));
     }
-};
+  };
 
   const validarContrasena = (contrasena) => {
     const regexContrasena =
@@ -202,8 +249,7 @@ function PaginaEditarPerfil() {
                 type="button"
                 onClick={toggleMostrarContrasena}
                 className={estilosEditarPerfil["mostrar-contrasena"]}
-              >
-              </button>
+              ></button>
             </div>
           </div>
           <div className={`${estilosEditarPerfil["div-contrasenas"]}`}>
@@ -241,8 +287,7 @@ function PaginaEditarPerfil() {
                 type="button"
                 onClick={toggleMostrarContrasena}
                 className={estilosEditarPerfil["mostrar-contrasena"]}
-              >
-              </button>
+              ></button>
             </div>
           </div>
         </div>
