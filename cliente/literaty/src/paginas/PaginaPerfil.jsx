@@ -20,6 +20,7 @@ function PaginaPerfil() {
     popupVisible,
   } = useListas();
   const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [librosAnteriores, setLibrosAnteriores] = useState(null);
 
   const onIconClick = (icono) => {
     if (icono === "person") {
@@ -38,10 +39,9 @@ function PaginaPerfil() {
 
   const handleBusqueda = async (termino) => {
     try {
+      setLibrosAnteriores(libros); // Guarda el estado de los libros actuales antes de buscar
       const respuesta = await fetch(
-        `http://localhost:3000/api/buscar?termino=${encodeURIComponent(
-          termino
-        )}`
+        `http://localhost:3000/api/buscar?termino=${encodeURIComponent(termino)}`
       );
       if (respuesta.ok) {
         const data = await respuesta.json();
@@ -51,6 +51,13 @@ function PaginaPerfil() {
       }
     } catch (error) {
       console.error("Error al buscar libros:", error);
+    }
+  };
+
+  const handleVolver = () => {
+    if (librosAnteriores) {
+      setLibros(librosAnteriores);
+      setLibrosAnteriores(null);
     }
   };
 
@@ -80,13 +87,26 @@ function PaginaPerfil() {
 
   return (
     <div>
+      {librosAnteriores && (
+        <span 
+          className="material-symbols-outlined"
+          style={{
+            position: "absolute",
+            top: "70px",
+            left: "30px",
+            cursor: "pointer",
+            fontSize: "40px",
+          }}
+          onClick={handleVolver}
+        >
+          arrow_back
+        </span>
+      )}
       <NombreBuscador onBusqueda={handleBusqueda} />
       {cargando ? (
         <h3 className={principal.cargando}>Buscando nuevos libros 👀...</h3>
       ) : (
-        <SeccionLibros
-          librosGoogleBooks={libros}
-        />
+        <SeccionLibros librosGoogleBooks={libros} />
       )}
       <Footer
         iconos={["bookmark", "refresh", "person"]}

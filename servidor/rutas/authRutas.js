@@ -8,7 +8,7 @@ router.get('/verificar-token', verificarToken, (peticion, respuesta) => {
   });
 router.get('/ruta-protegida', verificarToken, accesoRutaProtegida);
 router.post("/iniciar-sesion", iniciarSesion);
-router.post("/refrescar-token", refrescarToken);
+router.post("/renovar-token", refrescarToken);
 router.post("/crear-cuenta", crearCuenta);
 router.post("/cerrar-sesion", cerrarSesion);
 
