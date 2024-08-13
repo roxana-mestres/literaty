@@ -19,8 +19,10 @@ function PaginaEditarPerfil() {
   const [contrasenaRepetida, setContrasenaRepetida] = useState("");
   const [indiceAvatar, setIndiceAvatar] = useState(dataUsuario.avatar || 0);
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
-
   const avatares = [avatar0, avatar1, avatar2, avatar3, avatar4, avatar5];
+  const [nombreOriginal, setNombreOriginal] = useState(dataUsuario.nombre);
+  const [emailOriginal, setEmailOriginal] = useState(dataUsuario.email);
+  const [alertas, setAlertas] = useState([]); 
 
   useEffect(() => {
     setIndiceAvatar(dataUsuario.avatar || 0);
@@ -40,37 +42,90 @@ function PaginaEditarPerfil() {
 
   const handleGuardarCambios = async () => {
     const usuarioId = dataUsuario._id;
+    const nuevasAlertas = [];
 
-    try {
-      const respuesta = await fetch(
-        `http://localhost:3000/api/usuario/actualizar/${usuarioId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...dataUsuario,
-            contrasenaActual,
-            contrasena,
-            avatar: indiceAvatar,
-          }),
-        }
-      );
-
-      if (!respuesta.ok) {
-        throw new Error("Error al actualizar el usuario");
-      }
-
-      const usuarioActualizado = await respuesta.json();
-      actualizarDataUsuario(usuarioActualizado);
-      setContrasena("");
-      setContrasenaRepetida("");
-      setContrasenaActual("");
-    } catch (error) {
-      console.error("Error al actualizar el usuario:", error);
+    // Verificar si se cambió el nombre o el correo
+    if (dataUsuario.nombre !== nombreOriginal || dataUsuario.email !== emailOriginal) {
+        nuevasAlertas.push("Los cambios en el perfil han sido guardados correctamente.");
     }
-  };
+
+    // Verificar si se cambió la contraseña
+    if (contrasena && contrasenaActual && contrasena === contrasenaRepetida) {
+        const contrasenaValida = validarContrasena(contrasena);
+        if (!contrasenaValida) {
+            alert("La nueva contraseña no cumple con los requisitos.");
+            return;
+        }
+
+        try {
+            const respuestaContrasena = await fetch(
+                `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        contrasenaActual,
+                        contrasena,
+                    }),
+                }
+            );
+
+            if (!respuestaContrasena.ok) {
+                const errorData = await respuestaContrasena.json();
+                throw new Error(
+                    errorData.mensaje || "Error al actualizar la contraseña"
+                );
+            }
+
+            nuevasAlertas.push("La contraseña ha sido actualizada correctamente.");
+        } catch (error) {
+            console.error("Error al actualizar la contraseña:", error);
+            alert("Hubo un problema al actualizar la contraseña.");
+            return;
+        }
+
+        setContrasena("");
+        setContrasenaRepetida("");
+        setContrasenaActual("");
+    }
+
+    // Guardar los cambios del perfil y el avatar
+    try {
+        const respuestaPerfil = await fetch(
+            `http://localhost:3000/api/usuario/actualizar/${usuarioId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ...dataUsuario,
+                    avatar: indiceAvatar,
+                }),
+            }
+        );
+
+        if (!respuestaPerfil.ok) {
+            throw new Error("Error al actualizar el usuario");
+        }
+
+        const usuarioActualizado = await respuestaPerfil.json();
+        actualizarDataUsuario(usuarioActualizado);
+        setNombreOriginal(usuarioActualizado.nombre);
+        setEmailOriginal(usuarioActualizado.email);
+    } catch (error) {
+        console.error("Error al actualizar el usuario:", error);
+        alert("Hubo un problema al actualizar el perfil.");
+        return;
+    }
+
+    // Mostrar alerta final
+    if (nuevasAlertas.length > 0) {
+        alert(nuevasAlertas.join("\n"));
+    }
+};
 
   const handleActualizarContrasena = async () => {
     if (contrasena !== contrasenaRepetida) {
@@ -123,10 +178,10 @@ function PaginaEditarPerfil() {
     }
   };
 
-  const validarContrasena = (password) => {
+  const validarContrasena = (contrasena) => {
     const regexContrasena =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
-    const esValida = regexContrasena.test(password);
+    const esValida = regexContrasena.test(contrasena);
     console.log("Contraseña válida:", esValida);
     return esValida;
   };
@@ -180,6 +235,7 @@ function PaginaEditarPerfil() {
             type="email"
             value={dataUsuario && dataUsuario.email ? dataUsuario.email : ""}
             onChange={(e) => handleCambioInput("email", e.target.value)}
+            className={`${estilosEditarPerfil["correo-input"]}`}
           />
         </div>
       </div>
@@ -202,9 +258,6 @@ function PaginaEditarPerfil() {
                 onClick={toggleMostrarContrasena}
                 className={estilosEditarPerfil["mostrar-contrasena"]}
               >
-                <span className="material-symbols-outlined">
-                  {mostrarContrasena ? "visibility_off" : "visibility"}
-                </span>
               </button>
             </div>
           </div>
@@ -244,9 +297,6 @@ function PaginaEditarPerfil() {
                 onClick={toggleMostrarContrasena}
                 className={estilosEditarPerfil["mostrar-contrasena"]}
               >
-                <span className="material-symbols-outlined">
-                  {mostrarContrasena ? "visibility_off" : "visibility"}
-                </span>
               </button>
             </div>
           </div>
@@ -261,7 +311,6 @@ function PaginaEditarPerfil() {
         contenidoPersonalizado={contenidoPersonalizado}
         titulo={titulo}
         claseContenido={estilosEditarPerfil["contenido-editar-perfil"]}
-        guardarCambios={handleGuardarCambios}
         dataUsuario={dataUsuario}
         onCambioInput={handleCambioInput}
         actualizarDataUsuario={actualizarDataUsuario}

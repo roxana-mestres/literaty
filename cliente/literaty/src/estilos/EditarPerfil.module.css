@@ -115,6 +115,10 @@
   flex: 1;
 }
 
+.correo-input input{
+  width: 100%;
+}
+
 .celda-cinco {
   border-bottom: 3px dotted #252627;
 }
@@ -147,12 +151,6 @@
 input {
   color: #252627;
 }
-
-.celda input {
-  width: 200px;
-}
-
-/* CONTENIDO BORRAR */
 
 .div-contrasenas {
   display: flex;
@@ -206,9 +204,7 @@ input {
   padding-left: 16px;
 }
 
-.correo input {
-  flex: 1;
-}
+
 
 @media screen and (max-width: 767px) {
   .contenido-editar-perfil {
