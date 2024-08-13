@@ -39,7 +39,7 @@ export const LibrosProvider = ({ children }) => {
             "Content-Type": "application/json",
           },
           credentials: 'include',
-          body: JSON.stringify({ usuarioId }) // Enviar el ID del usuario en el cuerpo de la solicitud si es necesario
+          body: JSON.stringify({ usuarioId })
         });
 
         if (respuesta.ok) {
@@ -94,7 +94,7 @@ export const LibrosProvider = ({ children }) => {
   };
 
   return (
-    <LibrosContexto.Provider value={{ libros, cargando, error, obtenerLibros, handleEliminarLibro }}>
+    <LibrosContexto.Provider value={{ libros, setLibros, cargando, error, obtenerLibros, handleEliminarLibro }}>
       {children}
     </LibrosContexto.Provider>
   );
