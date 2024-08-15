@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useListas } from "../../contextos/contextoListas";
 import { useUsuario } from "../../contextos/contextoUsuario";
 import { AuthContexto } from "../../contextos/contextoAuth";
@@ -30,6 +30,9 @@ function ComponenteListas() {
     useListas();
 
   const usuarioId = dataUsuario?._id;
+
+  const contenedorIconosRef = useRef(null); 
+  const referenciasListas = useRef({});
 
   const manejarErrorYReintentar = async (funcion, ...params) => {
     try {
@@ -130,10 +133,23 @@ function ComponenteListas() {
       if (respuesta.ok) {
         const data = await respuesta.json();
         console.log("Datos de la respuesta:", data);
-        setListasDeLibros([
-          ...listasDeLibros,
-          { ...nuevaLista, _id: data._id },
+
+        const nuevaListaConId = { ...nuevaLista, _id: data._id };
+        setListasDeLibros(prevListas => [
+          ...prevListas,
+          nuevaListaConId,
         ]);
+
+        // Desplazar al nuevo elemento
+        requestAnimationFrame(() => {
+          const nuevoElemento = referenciasListas.current[nuevaListaConId._id];
+          if (contenedorIconosRef.current && nuevoElemento) {
+            contenedorIconosRef.current.scrollTo({
+              left: nuevoElemento.offsetLeft - contenedorIconosRef.current.offsetLeft,
+              behavior: "smooth"
+            });
+          }
+        });
       } else {
         console.error("Error al crear la lista");
         const errorText = await respuesta.text();
@@ -143,6 +159,7 @@ function ComponenteListas() {
       console.error("Error al crear la lista:", error);
     }
   };
+
 
   const eliminarLista = async (listaId) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta lista?")) {
@@ -307,7 +324,7 @@ function ComponenteListas() {
           </Link>
           <h1 className={listas["titulo"]}>Tus listas</h1>
         </div>
-        <div className={listas["div-iconos-mas"]}>
+        <div ref={contenedorIconosRef}className={listas["div-iconos-mas"]}>
           <div className={listas["circulo-contenedor"]} onClick={agregarLista}>
             <div className={listas["circulo"]}>
               <span className={listas["mas"]}>+</span>
@@ -317,6 +334,7 @@ function ComponenteListas() {
             {listasDeLibros.map((lista) => (
               <div
                 key={lista._id}
+                ref={(el) => (referenciasListas.current[lista._id] = el)}
                 className={listas["titulo-lista"]}
                 onClick={() => manejarClickLista(lista._id)}
               >
