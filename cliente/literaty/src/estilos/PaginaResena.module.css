@@ -45,7 +45,6 @@
 
 .popup-derecha {
   max-width: 30%;
-  padding: 20px;
   border-radius: 5px;
   border: 2px solid #252627;
   background-color: #f4e5e0;
@@ -80,5 +79,16 @@
   }
   .textoresena {
     margin-top: 40px;
+    width: 100%;
+    align-items: center;
+    padding: 20px;
+  }
+  .div-flecha-itemlibro {
+    width: 95%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 50px;
   }
 }

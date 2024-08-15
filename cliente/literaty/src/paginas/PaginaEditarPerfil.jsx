@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import estilosEditarPerfil from "../estilos/EditarPerfil.module.css";
-import estilos from "../estilos/Comunes.module.css";
 import ComponenteEditarPerfil from "../componentes/PaginaEditarPerfil/ComponenteEditarPerfil";
 import { useUsuario } from "../contextos/contextoUsuario";
 import {AuthContexto} from "../contextos/contextoAuth";
