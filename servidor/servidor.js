@@ -38,14 +38,6 @@ app.use('/api', listasRutas);
 app.use("/api", librosRutas);
 app.use("/api/usuario", usuarioRutas);
 
-// *** SERVIR LOS ARCHIVOS ESTÁTICOS DEL FRONTEND ***
-app.use(express.static(path.join(__dirname, '../cliente/literaty/dist')));
-
-// *** CAPTURAR TODAS LAS DEMÁS RUTAS Y DEVOLVER EL index.html ***
-app.get('*', (peticion, respuesta) => {
-  respuesta.sendFile(path.join(__dirname, '../cliente/literaty/dist', 'index.html'));
-});
-
 // Manejo de errores 404
 app.use((peticion, respuesta, siguiente) => {
   respuesta.status(404).send("404: Página no encontrada");
