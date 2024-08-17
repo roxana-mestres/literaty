@@ -39,9 +39,9 @@ function PaginaPerfil() {
 
   const handleBusqueda = async (termino) => {
     try {
-      setLibrosAnteriores(libros); // Guarda el estado de los libros actuales antes de buscar
+      setLibrosAnteriores(libros);
       const respuesta = await fetch(
-        `http://localhost:3000/api/buscar?termino=${encodeURIComponent(termino)}`
+        `https://literaty-backend.onrender.com/api/buscar?termino=${encodeURIComponent(termino)}`
       );
       if (respuesta.ok) {
         const data = await respuesta.json();
@@ -66,7 +66,7 @@ function PaginaPerfil() {
     if (mostrarPopup) {
       try {
         const respuesta = await fetch(
-          "http://localhost:3000/api/cerrar-sesion",
+          "https://literaty-backend.onrender.com/api/cerrar-sesion",
           {
             method: "POST",
             credentials: "include",

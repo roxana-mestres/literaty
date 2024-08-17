@@ -57,7 +57,7 @@ function PaginaEditarPerfil() {
   
       try {
         let respuestaContrasena = await fetch(
-          `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
+          `https://literaty-backend.onrender.com/api/usuario/actualizar-contrasena/${usuarioId}`,
           {
             method: "PUT",
             headers: {
@@ -75,7 +75,7 @@ function PaginaEditarPerfil() {
           const tokenRenovado = await renovarToken();
           if (tokenRenovado) {
             respuestaContrasena = await fetch(
-              `http://localhost:3000/api/usuario/actualizar-contrasena/${usuarioId}`,
+              `https://literaty-backend.onrender.com/api/usuario/actualizar-contrasena/${usuarioId}`,
               {
                 method: "PUT",
                 headers: {
@@ -113,7 +113,7 @@ function PaginaEditarPerfil() {
   
     try {
       let respuestaPerfil = await fetch(
-        `http://localhost:3000/api/usuario/actualizar/${usuarioId}`,
+        `https://literaty-backend.onrender.com/api/usuario/actualizar/${usuarioId}`,
         {
           method: "PUT",
           headers: {
@@ -131,7 +131,7 @@ function PaginaEditarPerfil() {
         const tokenRenovado = await renovarToken();
         if (tokenRenovado) {
           respuestaPerfil = await fetch(
-            `http://localhost:3000/api/usuario/actualizar/${usuarioId}`,
+            `https://literaty-backend.onrender.com/api/usuario/actualizar/${usuarioId}`,
             {
               method: "PUT",
               headers: {

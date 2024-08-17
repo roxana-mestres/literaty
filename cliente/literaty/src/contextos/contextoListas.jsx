@@ -53,7 +53,7 @@ export const ListasProvider = ({ children }) => {
     
     try {
       let respuesta = await fetch(
-        `http://localhost:3000/api/listas/${usuarioId}`,
+        `https://literaty-backend.onrender.com/api/listas/${usuarioId}`,
         {
           method: "GET",
           headers: {
@@ -71,7 +71,7 @@ export const ListasProvider = ({ children }) => {
         if (tokenRenovado) {
           console.log("Token renovado exitosamente. Reintentando obtener listas.");
           respuesta = await fetch(
-            `http://localhost:3000/api/listas/${usuarioId}`,
+            `https://literaty-backend.onrender.com/api/listas/${usuarioId}`,
             {
               method: "GET",
               headers: {
@@ -116,7 +116,7 @@ export const ListasProvider = ({ children }) => {
 
     try {
       const respuesta = await fetch(
-        `http://localhost:3000/api/listas/${listaId}/libros`,
+        `https://literaty-backend.onrender.com/api/listas/${listaId}/libros`,
         {
           method: "POST",
           headers: {
@@ -147,7 +147,7 @@ export const ListasProvider = ({ children }) => {
 
     try {
       const respuesta = await fetch(
-        `http://localhost:3000/api/listas/${usuarioId}/${listaId}/libros/${libroId}`,
+        `https://literaty-backend.onrender.com/api/listas/${usuarioId}/${listaId}/libros/${libroId}`,
         {
           method: "DELETE",
           headers: {
@@ -170,7 +170,7 @@ export const ListasProvider = ({ children }) => {
 
     try {
       const respuesta = await fetch(
-        `http://localhost:3000/api/listas/${usuarioId}/${listaId}`,
+        `https://literaty-backend.onrender.com/api/listas/${usuarioId}/${listaId}`,
         {
           method: "DELETE",
           headers: {

@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const verificarAutenticacion = async () => {
       try {
-        const respuesta = await fetch("http://localhost:3000/api/verificar-token", {
+        const respuesta = await fetch("https://literaty-backend.onrender.com/api/verificar-token", {
           method: "GET",
           credentials: "include",
         });
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
   const renovarToken = async () => {
     try {
-      const respuesta = await fetch("http://localhost:3000/api/renovar-token", {
+      const respuesta = await fetch("https://literaty-backend.onrender.com/api/renovar-token", {
         method: "POST",
         credentials: "include",
       });

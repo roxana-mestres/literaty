@@ -92,7 +92,7 @@ const validarContrasena = (password) => {
 
     console.log("Datos del usuario a enviar:", usuario);
 
-    const respuesta = await fetch("http://localhost:3000/api/crear-cuenta", {
+    const respuesta = await fetch("https://literaty-backend.onrender.com/api/crear-cuenta", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(usuario),

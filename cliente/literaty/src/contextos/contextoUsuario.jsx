@@ -21,7 +21,7 @@ export const UsuarioProvider = ({ children }) => {
   const fetchUsuario = async () => {
     console.log("Inicio de fetchUsuario");
     try {
-      const respuesta = await fetch('http://localhost:3000/api/usuario/por-token', {
+      const respuesta = await fetch('https://literaty-backend.onrender.com/api/usuario/por-token', {
         method: 'GET',
         credentials: 'include',
       });

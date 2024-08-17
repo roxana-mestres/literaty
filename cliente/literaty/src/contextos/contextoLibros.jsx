@@ -33,7 +33,7 @@ export const LibrosProvider = ({ children }) => {
 
     for (let i = 0; i < intentos; i++) {
       try {
-        const respuesta = await fetch("http://localhost:3000/api/libros", {
+        const respuesta = await fetch("https://literaty-backend.onrender.com/api/libros", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -72,7 +72,7 @@ export const LibrosProvider = ({ children }) => {
     }
 
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/libros/${libroId}`, {
+      const respuesta = await fetch(`https://literaty-backend.onrender.com/api/libros/${libroId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

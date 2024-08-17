@@ -56,7 +56,7 @@ function ComponenteListas() {
       try {
         console.log(`Fetching listas for usuarioId: ${usuarioId}`);
         const respuesta = await manejarErrorYReintentar(
-          async () => await fetch(`http://localhost:3000/api/listas/${usuarioId}`)
+          async () => await fetch(`https://literaty-backend.onrender.com/api/listas/${usuarioId}`)
         );
 
         if (!respuesta.ok) {
@@ -114,7 +114,7 @@ function ComponenteListas() {
 
       const respuesta = await manejarErrorYReintentar(
         async () => await fetch(
-          `http://localhost:3000/api/agregar-lista/${usuarioId}`,
+          `https://literaty-backend.onrender.com/api/agregar-lista/${usuarioId}`,
           {
             method: "POST",
             headers: {
@@ -167,7 +167,7 @@ function ComponenteListas() {
       try {
         const respuesta = await manejarErrorYReintentar(
           async () => await fetch(
-            `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
+            `https://literaty-backend.onrender.com/api/${usuarioId}/listas/${listaId}`,
             {
               method: "DELETE",
             }
@@ -220,7 +220,7 @@ function ComponenteListas() {
     try {
       const respuesta = await manejarErrorYReintentar(
         async () => await fetch(
-          `http://localhost:3000/api/${usuarioId}/listas/${listaId}`,
+          `https://literaty-backend.onrender.com/api/${usuarioId}/listas/${listaId}`,
           {
             method: "PUT",
             headers: {
@@ -268,7 +268,7 @@ function ComponenteListas() {
     localStorage.setItem("indiceSeleccionado", listaId);
 
     try {
-      const url = `http://localhost:3000/api/obtener-libros/${usuarioId}/${listaId}`;
+      const url = `https://literaty-backend.onrender.com/api/obtener-libros/${usuarioId}/${listaId}`;
       console.log(`URL de la solicitud: ${url}`);
 
       const respuesta = await manejarErrorYReintentar(

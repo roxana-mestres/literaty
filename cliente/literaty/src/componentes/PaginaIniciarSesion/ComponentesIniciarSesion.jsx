@@ -17,7 +17,7 @@ function ComponenteIniciarSesion() {
 
     try {
       const respuesta = await fetch(
-        "http://localhost:3000/api/iniciar-sesion",
+        "https://literaty-backend.onrender.com/api/iniciar-sesion",
         {
           method: "POST",
           headers: {
