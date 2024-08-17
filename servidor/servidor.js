@@ -22,7 +22,7 @@ app.use(cookieParser());
 
 // Configurar CORS para permitir todas las solicitudes desde el puerto 5173
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://literaty-front.onrender.com',
   credentials: true,
 }));
 
