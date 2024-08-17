@@ -38,6 +38,10 @@ app.use('/api', listasRutas);
 app.use("/api", librosRutas);
 app.use("/api/usuario", usuarioRutas);
 
+app.get('/', (peticion, respuesta) => {
+  respuesta.send('Bienvenido a la API de Literaty');
+});
+
 // Manejo de errores 404
 app.use((peticion, respuesta, siguiente) => {
   respuesta.status(404).send("404: Página no encontrada");
