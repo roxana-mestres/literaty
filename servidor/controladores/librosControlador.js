@@ -30,7 +30,6 @@ const buscarLibros = async (peticion, respuesta) => {
 const obtenerLibros = async (peticion, respuesta) => {
   try {
     const token = peticion.cookies.access_token;
-    console.log("Token recibido librosControlador:", token);
 
     if (!token) {
       return respuesta.status(401).json({ message: "No hay token de autenticación" });

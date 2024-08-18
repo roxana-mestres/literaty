@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 
 const verificarToken = (peticion, respuesta, siguiente) => {
   const token = peticion.cookies.access_token;
-  console.log("Token recibido authMiddleware:", token);
   if (!token) {
     return respuesta.status(403).json({ message: "Acceso denegado, token no proporcionado" });
   }

@@ -19,21 +19,17 @@ export const ListasProvider = ({ children }) => {
   const [librosGuardados, setLibrosGuardados] = useState([]);
 
   useEffect(() => {
-    console.log("Verificando dataUsuario en ListasProvider:", dataUsuario);
     if (dataUsuario && dataUsuario._id) {
       obtenerListas();
     } else {
-      console.log("dataUsuario no está disponible o no tiene un _id válido.");
+      console.error("dataUsuario no está disponible o no tiene un _id válido.");
     }
   }, [dataUsuario]);
 
   useEffect(() => {
-    console.log("useEffect para actualizar libros ejecutado");
     if (listas.length > 0) {
-      console.log("Listas disponibles:", listas);
       const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
       if (listaMeGusta) {
-        console.log("Lista 'Me gusta' encontrada:", listaMeGusta);
         setLibrosFavoritos(listaMeGusta.libros);
       }
 
@@ -42,14 +38,12 @@ export const ListasProvider = ({ children }) => {
         .flatMap((lista) => lista.libros);
 
       setLibrosGuardados(librosEnGuardados);
-      console.log("Libros guardados en useEffect:", librosGuardados);
     }
   }, [listas]);
 
   const obtenerListas = async () => {
     setCargandoListas(true);
     const usuarioId = dataUsuario._id;
-    console.log("Intentando obtener listas para el usuario:", usuarioId);
     
     try {
       let respuesta = await fetch(
@@ -63,13 +57,9 @@ export const ListasProvider = ({ children }) => {
         }
       );
   
-      console.log("Respuesta inicial de la API:", respuesta);
-  
       if (respuesta.status === 401) {
-        console.log("Token expirado, intentando renovar...");
         const tokenRenovado = await renovarToken();
         if (tokenRenovado) {
-          console.log("Token renovado exitosamente. Reintentando obtener listas.");
           respuesta = await fetch(
             `https://literaty-backend.onrender.com/api/listas/${usuarioId}`,
             {
@@ -90,7 +80,6 @@ export const ListasProvider = ({ children }) => {
       }
   
       const data = await respuesta.json();
-      console.log("Listas obtenidas:", data);
       setListas(data);
   
       const listaMeGusta = data.find((lista) => lista.nombre === "Me gusta");
@@ -112,7 +101,6 @@ export const ListasProvider = ({ children }) => {
 
   const agregarLibroALista = async (listaId, libro, libroId) => {
     const usuarioId = dataUsuario._id;
-    console.log("Agregar libro a lista:", { listaId, libro, libroId, usuarioId });
 
     try {
       const respuesta = await fetch(
@@ -130,7 +118,6 @@ export const ListasProvider = ({ children }) => {
       );
       if (respuesta.ok) {
         await obtenerListas();
-        console.log("Libro agregado a la lista contextoListas:", libroId);
       } else {
         console.error(
           "Error al agregar libro a la lista:",
@@ -189,15 +176,11 @@ export const ListasProvider = ({ children }) => {
   };
 
   const handleHeartClick = async (libroId) => {
-    console.log("handleHeartClick llamado con ID:", libroId);
 
     if (!libroId) {
-      console.log("ID del libro es inválido");
       alert("El libro no tiene un ID válido.");
       return;
     }
-
-    console.log("ID del libro seleccionado:", libroId);
 
     try {
       const listaMeGusta = listas.find((lista) => lista.nombre === "Me gusta");
@@ -208,10 +191,7 @@ export const ListasProvider = ({ children }) => {
         return;
       }
 
-      console.log("ID del libro en 'Me gusta':", libroId);
-
       const libroEnLista = listaMeGusta.libros.includes(libroId);
-      console.log("El libro está en la lista 'Me gusta':", libroEnLista);
 
       if (!libroEnLista) {
         await agregarLibroALista(listaMeGusta._id, { id: libroId }, libroId);
@@ -239,7 +219,6 @@ export const ListasProvider = ({ children }) => {
       .map((lista) => lista._id);
 
     setListasSeleccionadas(listasQueContienenElLibro);
-    console.log("listasSeleccionadas contextoListas:", listasSeleccionadas);
   };
 
   const cerrarPopupLista = () => {
@@ -248,17 +227,8 @@ export const ListasProvider = ({ children }) => {
   };
 
   const handleCambioCheckbox = (listaId) => {
-    console.log("listaId en contextoListas", listaId);
-    console.log(
-      "listasSeleccionadas en handleCambioCheckbox antes de cambiar valor:",
-      listasSeleccionadas
-    );
     setListasSeleccionadas((prev) => {
       if (prev.includes(listaId)) {
-        console.log(
-          "listasSeleccionadas en handleCambioCheckbox después de cambiar valor:",
-          listasSeleccionadas
-        );
         return prev.filter((id) => id !== listaId);
       } else {
         return [...prev, listaId];
@@ -299,10 +269,6 @@ export const ListasProvider = ({ children }) => {
       }
 
       await obtenerListas();
-      console.log(
-        "Libros guardados después de obtener listas:",
-        librosGuardados
-      );
       if (listasParaEliminar.length > 0) {
         mensaje += "El libro ha sido eliminado correctamente de las listas.";
       }

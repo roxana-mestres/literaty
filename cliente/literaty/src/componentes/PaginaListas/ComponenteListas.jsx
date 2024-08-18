@@ -61,7 +61,6 @@ function ComponenteListas() {
   useEffect(() => {
     const fetchListas = async () => {
       try {
-        console.log(`Fetching listas for usuarioId: ${usuarioId}`);
         const respuesta = await manejarErrorYReintentar(
           async () => await fetch(`https://literaty-backend.onrender.com/api/listas/${usuarioId}`)
         );
@@ -71,7 +70,6 @@ function ComponenteListas() {
         }
 
         let data = await respuesta.json();
-        console.log("Listas obtenidas:", data);
 
         data = data.map((lista, index) => ({
           ...lista,
@@ -117,8 +115,6 @@ function ComponenteListas() {
         protegida: false,
       };
 
-      console.log("Enviando solicitud para crear lista con datos:", nuevaLista);
-
       const respuesta = await manejarErrorYReintentar(
         async () => await fetch(
           `https://literaty-backend.onrender.com/api/agregar-lista/${usuarioId}`,
@@ -135,11 +131,8 @@ function ComponenteListas() {
         )
       );
 
-      console.log("Respuesta de la solicitud:", respuesta);
-
       if (respuesta.ok) {
         const data = await respuesta.json();
-        console.log("Datos de la respuesta:", data);
 
         const nuevaListaConId = { ...nuevaLista, _id: data._id };
         setListasDeLibros(prevListas => [
@@ -158,7 +151,6 @@ function ComponenteListas() {
           }
         });
       } else {
-        console.error("Error al crear la lista");
         const errorText = await respuesta.text();
         console.error("Texto del error:", errorText);
       }
@@ -170,7 +162,6 @@ function ComponenteListas() {
 
   const eliminarLista = async (listaId) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta lista?")) {
-      console.log("ID de la lista a eliminar:", listaId);
       try {
         const respuesta = await manejarErrorYReintentar(
           async () => await fetch(
@@ -181,15 +172,12 @@ function ComponenteListas() {
           )
         );
 
-        console.log("Respuesta de la solicitud de eliminación:", respuesta);
-
         if (respuesta.ok) {
           const nuevasListas = listasDeLibros.filter(
             (lista) => lista._id !== listaId
           );
           setListasDeLibros(nuevasListas);
           setIndiceSeleccionado(null);
-          console.log("Lista eliminada y estado actualizado.");
         } else {
           console.error(
             "Error al eliminar la lista. Estado:",
@@ -241,8 +229,6 @@ function ComponenteListas() {
       if (!respuesta.ok) {
         throw new Error("Error al actualizar el nombre de la lista");
       }
-
-      console.log("Nombre de la lista actualizado exitosamente");
     } catch (error) {
       console.error("Error al actualizar el nombre de la lista:", error);
     }
@@ -260,7 +246,6 @@ function ComponenteListas() {
   };
 
   const manejarClickLista = async (listaId) => {
-    console.log(`ID de la lista seleccionada: ${listaId}`);
 
     const listaSeleccionada = listasDeLibros.find(
       (lista) => lista._id === listaId
@@ -270,19 +255,15 @@ function ComponenteListas() {
     }
 
     setIndiceSeleccionado(listaId);
-    console.log(`Índice de lista seleccionado cambiado a: ${listaId}`);
 
     localStorage.setItem("indiceSeleccionado", listaId);
 
     try {
       const url = `https://literaty-backend.onrender.com/api/obtener-libros/${usuarioId}/${listaId}`;
-      console.log(`URL de la solicitud: ${url}`);
 
       const respuesta = await manejarErrorYReintentar(
         async () => await fetch(url)
       );
-
-      console.log("Respuesta del fetch:", respuesta);
 
       if (!respuesta.ok) {
         console.error(
@@ -293,7 +274,6 @@ function ComponenteListas() {
       }
 
       const data = await respuesta.json();
-      console.log("Datos de libros obtenidos:", data);
 
       setLibrosDeLista(data);
     } catch (error) {

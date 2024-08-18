@@ -74,7 +74,6 @@ function PaginaPerfil() {
         );
 
         if (respuesta.ok) {
-          console.log("Cierre de sesión exitoso");
           navegar("/");
         } else {
           console.error("Error al cerrar sesión");

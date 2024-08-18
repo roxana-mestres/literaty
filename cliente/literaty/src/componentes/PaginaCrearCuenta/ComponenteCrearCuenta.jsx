@@ -29,7 +29,6 @@ const ComponenteCrearCuenta = () => {
 
   const cambiarAvatar = () => {
     setIndiceAvatar((prevIndice) => (prevIndice + 1) % imagenesAvatar.length);
-    console.log("Avatar actual", indiceAvatar);
   };
 
   const handleCambiosInput = (e) => {
@@ -59,7 +58,6 @@ const validarContrasena = (password) => {
     e.preventDefault();
 
     if (typeof formData.avatar !== "number") {
-      console.error("El avatar no es un número válido")
       return;
     }
 
@@ -90,8 +88,6 @@ const validarContrasena = (password) => {
       avatar: indiceAvatar,
     };
 
-    console.log("Datos del usuario a enviar:", usuario);
-
     const respuesta = await fetch("https://literaty-backend.onrender.com/api/crear-cuenta", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -101,13 +97,10 @@ const validarContrasena = (password) => {
     if (respuesta.ok && data.message === "Cuenta creada exitosamente") {
       setExito(true);
       setError("");
-      console.log("Cuenta creada con éxito. Redirigiendo a la página de inicio de sesión...");
-      console.log("Llamando a la función de navegación...");
       window.location.href = '/iniciar-sesion';
     } else {
       setExito(false);
       setError(data.message || "Error desconocido");
-      console.error(`Error al crear la cuenta: ${JSON.stringify(data)}`);
     }
   };
 

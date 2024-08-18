@@ -64,8 +64,6 @@ function ComponenteItemLibro({ libro, indiceSeleccionado, context, ...props }) {
           console.error("Error: No se ha seleccionado una lista actual.");
           return;
         }
-  
-        console.log("Eliminando libro:", libroId, "de la lista:", indiceSeleccionado);
         eliminarLibroDeLista(indiceSeleccionado, libroId);
       } else {
         console.error("Error: Contexto no válido.");

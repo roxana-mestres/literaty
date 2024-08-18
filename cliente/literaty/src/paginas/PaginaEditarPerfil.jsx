@@ -12,7 +12,6 @@ import avatar5 from "../assets/avatar-5.svg";
 
 function PaginaEditarPerfil() {
   const { usuario: dataUsuario, actualizarDataUsuario } = useUsuario();
-  console.log("Estos son los datos del usuario - dataUsuario: ", dataUsuario);
   const { renovarToken } = useContext(AuthContexto);
   const titulo = "Editar perfil";
   const [contrasenaActual, setContrasenaActual] = useState("");
@@ -173,7 +172,6 @@ function PaginaEditarPerfil() {
     const regexContrasena =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/;
     const esValida = regexContrasena.test(contrasena);
-    console.log("Contraseña válida:", esValida);
     return esValida;
   };
 

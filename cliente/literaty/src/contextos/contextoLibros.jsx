@@ -11,9 +11,6 @@ export const LibrosProvider = ({ children }) => {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
-  console.log("ID de usuario en contextoLibros:", usuario._id);
-  console.log("usuario en contextoLibros:", usuario);
-
   useEffect(() => {
     if (!cargandoUsuario && usuario._id) {
       obtenerLibros();

@@ -16,7 +16,6 @@ function ComponenteIniciarSesion() {
     const usuario = { email, password };
 
     try {
-      console.log("Enviando solicitud de inicio de sesión con:", usuario);
       const respuesta = await fetch(
         "https://literaty-backend.onrender.com/api/iniciar-sesion",
         {
@@ -29,15 +28,13 @@ function ComponenteIniciarSesion() {
         }
       );
 
-      console.log("Respuesta del servidor:", respuesta);
       const data = await respuesta.json();
-      console.log("Datos recibidos:", data);
+
       if (data.message === "Inicio de sesión exitoso") {
         setError("");
         setExito(true);
         window.location.href = '/perfil';
       } else {
-        console.error("Error al iniciar sesión:", data.message);
         setError(data.message);
         setExito(false);
       }

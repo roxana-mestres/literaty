@@ -14,8 +14,6 @@ function NombreBuscador({ className, claseBuscador, onBusqueda }) {
   const [termino, setTermino] = useState("");
   const { usuario } = useUsuario();
 
-  console.log("usuario en componenteNombreBuscador", usuario);
-
   const avatares = {
     0: avatar0,
     1: avatar1,
