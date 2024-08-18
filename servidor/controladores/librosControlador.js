@@ -62,7 +62,6 @@ const obtenerLibros = async (peticion, respuesta) => {
     const maxResultadosPorSolicitud = 30;
     const cantidadDeseada = 12;
     const maxIntentos = 5;
-    const calificacionMinima = 1;
 
     let librosFiltrados = [];
     const librosUnicos = new Map();
@@ -75,19 +74,19 @@ const obtenerLibros = async (peticion, respuesta) => {
       "children's stories",
       "animals",
       "computers",
-      "American periodicals",
-      "Mexico",
-      "Business & Economics",
-      "Political Science",
-      "Religion",
-      "Encyclopedias and dictionaries",
-      "Young Adult Fiction",
-      "Mexican drama",
-      "Mormon Church",
-      "Games & Activities",
-      "Naval art and science",
-      "Foreign Language Study",
-      "Customer services"
+      "american periodicals",
+      "mexico",
+      "business & economics",
+      "political science",
+      "religion",
+      "encyclopedias and dictionaries",
+      "young adult fiction",
+      "mexican drama",
+      "mormon church",
+      "games & activities",
+      "naval art and science",
+      "foreign language study",
+      "customer services"
     ]);
 
     const buscarLibros = async (idioma) => {
@@ -107,14 +106,17 @@ const obtenerLibros = async (peticion, respuesta) => {
               const volumenInfo = libro.volumeInfo || {};
               const categorias = volumenInfo.categories || [];
               const libroId = libro.id || "";
-              const calificacion = volumenInfo.averageRating || 0;
+
+              const categoriasValidas = categorias.every(
+                (categoria) => !categoriasExcluidas.has(categoria.toLowerCase())
+              );
+
               return (
                 !librosEliminados.has(libroId) &&
-                calificacion >= calificacionMinima &&
                 categorias.length > 0 &&
                 categorias[0] !== "Unknown" &&
                 volumenInfo.language === idioma &&
-                !categorias.some(categoria => categoriasExcluidas.has(categoria.toLowerCase()))
+                categoriasValidas
               );
             });
 
@@ -153,7 +155,6 @@ const obtenerLibros = async (peticion, respuesta) => {
     respuesta.status(500).json({ mensaje: "Error al obtener libros libroControlador", error });
   }
 };
-
 
 const librosEliminadosPorUsuario = new Map();
 
