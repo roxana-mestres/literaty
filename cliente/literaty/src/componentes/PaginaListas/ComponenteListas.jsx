@@ -10,13 +10,20 @@ import principal from "../../estilos/PaginaPrincipal.module.css";
 import ItemLibro from "../PaginaPerfil/ComponenteItemLibro";
 import ComponentePopupListas from "../../componentes/PaginaListas/ComponentePopupListas";
 
+import libro1 from '../../assets/libro-1.svg';
+import libro2 from '../../assets/libro-2.svg';
+import libro3 from '../../assets/libro-3.svg';
+import libro4 from '../../assets/libro-4.svg';
+import libro5 from '../../assets/libro-5.svg';
+import libro6 from '../../assets/libro-6.svg';
+
 const iconosLibros = [
-  "/src/assets/libro-1.svg",
-  "/src/assets/libro-2.svg",
-  "/src/assets/libro-3.svg",
-  "/src/assets/libro-4.svg",
-  "/src/assets/libro-5.svg",
-  "/src/assets/libro-6.svg",
+  libro1,
+  libro2,
+  libro3,
+  libro4,
+  libro5,
+  libro6,
 ];
 
 function ComponenteListas() {
