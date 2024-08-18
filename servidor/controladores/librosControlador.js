@@ -42,6 +42,21 @@ const obtenerLibros = async (peticion, respuesta) => {
       return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });
     }
 
+    const categoriasPermitidas = [
+      "Fiction",
+      "General",
+      "Self-Help",
+      "Thrillers",
+      "Historical",
+      "Contemporary",
+      "Epic",
+      "Classics",
+      "Women",
+      "Biography & Autobiography",
+      "Literary",
+      "Psychology"
+    ];
+
     const terminosDeBusqueda = [
       "bestseller",
       "top books",
@@ -53,30 +68,6 @@ const obtenerLibros = async (peticion, respuesta) => {
       "must read books",
       "all time favorites",
       "critically acclaimed books"
-    ];
-
-    const categoriasExcluidas = [
-      "Computers",
-      "Periodicals",
-      "Agricultural",
-      "Reference",
-      "Language",
-      "Young Adult Fiction",
-      "Juvenile Fiction",
-      "Juvenile",
-      "Art",
-      "Philology",
-      "Education",
-      "Securities",
-      "Medical",
-      "Customer Services",
-      "Abused Women",
-      "Family & Relationships",
-      "Latin America",
-      "Language Arts & Disciplines",
-      "Catalogs",
-      "Encyclopedia",
-      "Social Science"
     ];
 
     const maxResultadosPorSolicitud = 40;
@@ -104,15 +95,13 @@ const obtenerLibros = async (peticion, respuesta) => {
               const categorias = volumenInfo.categories || [];
               const calificacionPromedio = volumenInfo.averageRating || 0;
 
-              // Excluir libros que pertenezcan a una categoría en la lista de exclusión
-              const tieneCategoriaExcluida = categorias.some(categoria => 
-                categoriasExcluidas.includes(categoria)
+              const tieneCategoriaPermitida = categorias.some(categoria => 
+                categoriasPermitidas.includes(categoria)
               );
 
               return (
                 categorias.length > 0 &&
-                categorias[0] !== "Unknown" &&
-                !tieneCategoriaExcluida && // Filtro por categoría excluida
+                tieneCategoriaPermitida &&
                 calificacionPromedio >= 3
               );
             });
