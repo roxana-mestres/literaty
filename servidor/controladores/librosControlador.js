@@ -30,7 +30,6 @@ const buscarLibros = async (peticion, respuesta) => {
 const obtenerLibros = async (peticion, respuesta) => {
   try {
     const token = peticion.cookies.access_token;
-    console.log("Token recibido librosControlador:", token);
 
     if (!token) {
       return respuesta.status(401).json({ message: "No hay token de autenticación" });
@@ -38,8 +37,6 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     const data = jwt.verify(token, process.env.CLAVE);
     const usuarioId = data.id;
-
-    console.log("Datos del usuario librosControlador:", data);
 
     if (!usuarioId) {
       return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });
@@ -65,31 +62,8 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     let librosFiltrados = [];
     const librosUnicos = new Map();
-    const librosEliminados = librosEliminadosPorUsuario.get(usuarioId) || new Set();
 
-    const categoriasExcluidas = new Set([
-      "juvenile fiction",
-      "juvenile nonfiction",
-      "education",
-      "children's stories",
-      "animals",
-      "computers",
-      "american periodicals",
-      "mexico",
-      "business & economics",
-      "political science",
-      "religion",
-      "encyclopedias and dictionaries",
-      "young adult fiction",
-      "mexican drama",
-      "mormon church",
-      "games & activities",
-      "naval art and science",
-      "foreign language study",
-      "customer services"
-    ]);
-
-    const buscarLibros = async (idioma) => {
+    const buscarLibros = async (idioma, orderBy) => {
       const promesas = terminosDeBusqueda.map(async (termino) => {
         let intentos = 0;
         while (intentos < maxIntentos) {
@@ -98,27 +72,11 @@ const obtenerLibros = async (peticion, respuesta) => {
 
           try {
             const respuestaFetch = await fetch(
-              `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=relevance&langRestrict=${idioma}`
+              `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=${orderBy}&langRestrict=${idioma}`
             );
             const data = await respuestaFetch.json();
 
-            const nuevosLibros = (data.items || []).filter((libro) => {
-              const volumenInfo = libro.volumeInfo || {};
-              const categorias = volumenInfo.categories || [];
-              const libroId = libro.id || "";
-
-              const categoriasValidas = categorias.every(
-                (categoria) => !categoriasExcluidas.has(categoria.toLowerCase())
-              );
-
-              return (
-                !librosEliminados.has(libroId) &&
-                categorias.length > 0 &&
-                categorias[0] !== "Unknown" &&
-                volumenInfo.language === idioma &&
-                categoriasValidas
-              );
-            });
+            const nuevosLibros = data.items || [];
 
             nuevosLibros.forEach((libro) => {
               if (!librosUnicos.has(libro.id)) {
@@ -138,8 +96,10 @@ const obtenerLibros = async (peticion, respuesta) => {
     };
 
     await Promise.all([
-      buscarLibros('en'),
-      buscarLibros('es')
+      buscarLibros('en', 'relevance'),
+      buscarLibros('es', 'relevance'),
+      buscarLibros('en', 'newest'),
+      buscarLibros('es', 'newest')
     ]);
 
     librosFiltrados = Array.from(librosUnicos.values()).slice(0, cantidadDeseada);
