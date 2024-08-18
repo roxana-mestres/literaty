@@ -48,14 +48,14 @@ exports.crearCuenta = async (peticion, respuesta) => {
     respuesta
       .cookie("access_token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true,
+        sameSite: "lax",
         expiresIn: "15m"
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true,
+        sameSite: "lax",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       })
       .status(201)
@@ -104,14 +104,14 @@ exports.iniciarSesion = async (peticion, respuesta) => {
     respuesta
       .cookie("access_token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true,
+        sameSite: "lax",
         expiresIn: "15m"
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true,
+        sameSite: "lax",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       })
       .status(200)
@@ -152,8 +152,8 @@ exports.refrescarToken = async (peticion, respuesta) => {
 
     respuesta.cookie("access_token", nuevoAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "lax",
       expiresIn: "15m"
     });
 
