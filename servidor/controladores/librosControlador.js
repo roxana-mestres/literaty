@@ -48,9 +48,6 @@ const obtenerLibros = async (peticion, respuesta) => {
     const maxIntentos = 5;
 
     let librosFiltrados = [];
-    let intentos = 0;
-
-    // Map para verificar libros únicos
     const librosUnicos = new Map();
 
     const librosEliminados = librosEliminadosPorUsuario.get(usuarioId) || new Set();
@@ -58,55 +55,57 @@ const obtenerLibros = async (peticion, respuesta) => {
       "juvenile fiction", "juvenile nonfiction", "education", "children's stories", "animals"
     ]);
 
-    // Crear promesas para todas las búsquedas con diferentes términos
-    const promesas = terminosDeBusqueda.map(async (termino) => {
-      let intento = 0;
-      while (intento < maxIntentos) {
-        const indiceInicio = Math.floor(Math.random() * 500);
-        intento++;
-        
-        try {
-          const respuestaFetch = await fetch(
-            `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=relevance`
-          );
-          const data = await respuestaFetch.json();
-          
-          const nuevosLibros = (data.items || []).filter((libro) => {
-            const volumenInfo = libro.volumeInfo || {};
-            const categorias = volumenInfo.categories || [];
-            const libroId = libro.id || "";
-            const categoriasValidas = categorias.every(
-              (categoria) => !generosExcluidos.has(categoria.toLowerCase())
+    const buscarLibros = async (idioma) => {
+      const promesas = terminosDeBusqueda.map(async (termino) => {
+        for (let intento = 0; intento < maxIntentos; intento++) {
+          const indiceInicio = Math.floor(Math.random() * 500);
+
+          try {
+            const respuestaFetch = await fetch(
+              `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=relevance&langRestrict=${idioma}`
             );
-            return (
-              categoriasValidas &&
-              !librosEliminados.has(libroId) &&
-              categorias.length > 0 &&
-              categorias[0] !== "Unknown" &&
-              volumenInfo.averageRating
-            );
-          });
+            const data = await respuestaFetch.json();
 
-          // Agregar libros únicos al Map
-          nuevosLibros.forEach((libro) => {
-            if (!librosUnicos.has(libro.id)) {
-              librosUnicos.set(libro.id, libro);
-            }
-          });
+            const nuevosLibros = (data.items || []).filter((libro) => {
+              const volumenInfo = libro.volumeInfo || {};
+              const categorias = volumenInfo.categories || [];
+              const libroId = libro.id || "";
+              const categoriasValidas = categorias.every(
+                (categoria) => !generosExcluidos.has(categoria.toLowerCase())
+              );
+              const idiomaLibro = volumenInfo.language || "";
+              return (
+                categoriasValidas &&
+                !librosEliminados.has(libroId) &&
+                categorias.length > 0 &&
+                categorias[0] !== "Unknown" &&
+                volumenInfo.averageRating &&
+                idiomaLibro === idioma
+              );
+            });
 
-          // Salir si ya tenemos suficientes libros
-          if (librosUnicos.size >= cantidadDeseada) break;
+            nuevosLibros.forEach((libro) => {
+              if (!librosUnicos.has(libro.id)) {
+                librosUnicos.set(libro.id, libro);
+              }
+            });
 
-        } catch (error) {
-          console.error("Error al obtener libros de Google Books:", error);
+            if (librosUnicos.size >= cantidadDeseada) break;
+
+          } catch (error) {
+            console.error(`Error al obtener libros de Google Books para idioma ${idioma}:`, error);
+          }
         }
-      }
-    });
+      });
 
-    // Esperar a que todas las promesas terminen
-    await Promise.all(promesas);
+      await Promise.all(promesas);
+    };
 
-    // Convertir el Map a un array y limitar la cantidad deseada
+    await Promise.all([
+      buscarLibros('en'),
+      buscarLibros('es')
+    ]);
+
     librosFiltrados = Array.from(librosUnicos.values()).slice(0, cantidadDeseada);
 
     respuesta.json(librosFiltrados);
