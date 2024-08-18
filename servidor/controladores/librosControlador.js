@@ -57,7 +57,7 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     const librosEliminados = librosEliminadosPorUsuario.get(usuarioId) || new Set();
     const generosExcluidos = new Set([
-      "juvenile fiction", "juvenile nonfiction", "education", "children's stories", "animals"
+      "juvenile fiction", "juvenile nonfiction", "education", "children's stories", "animals", "computers", "American periodicals", "Mexico", "Business & Economics", "Political Science", "Religion", "Encyclopedias and dictionaries"
     ]);
 
     const buscarLibros = async (idioma) => {
