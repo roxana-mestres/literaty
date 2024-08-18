@@ -62,10 +62,33 @@ const obtenerLibros = async (peticion, respuesta) => {
     const maxResultadosPorSolicitud = 30;
     const cantidadDeseada = 12;
     const maxIntentos = 5;
+    const calificacionMinima = 1;
 
     let librosFiltrados = [];
     const librosUnicos = new Map();
     const librosEliminados = librosEliminadosPorUsuario.get(usuarioId) || new Set();
+
+    const categoriasExcluidas = new Set([
+      "juvenile fiction",
+      "juvenile nonfiction",
+      "education",
+      "children's stories",
+      "animals",
+      "computers",
+      "American periodicals",
+      "Mexico",
+      "Business & Economics",
+      "Political Science",
+      "Religion",
+      "Encyclopedias and dictionaries",
+      "Young Adult Fiction",
+      "Mexican drama",
+      "Mormon Church",
+      "Games & Activities",
+      "Naval art and science",
+      "Foreign Language Study",
+      "Customer services"
+    ]);
 
     const buscarLibros = async (idioma) => {
       const promesas = terminosDeBusqueda.map(async (termino) => {
@@ -84,11 +107,14 @@ const obtenerLibros = async (peticion, respuesta) => {
               const volumenInfo = libro.volumeInfo || {};
               const categorias = volumenInfo.categories || [];
               const libroId = libro.id || "";
+              const calificacion = volumenInfo.averageRating || 0;
               return (
                 !librosEliminados.has(libroId) &&
+                calificacion >= calificacionMinima &&
                 categorias.length > 0 &&
                 categorias[0] !== "Unknown" &&
-                volumenInfo.language === idioma
+                volumenInfo.language === idioma &&
+                !categorias.some(categoria => categoriasExcluidas.has(categoria.toLowerCase()))
               );
             });
 
