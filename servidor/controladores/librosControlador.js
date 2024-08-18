@@ -30,6 +30,7 @@ const buscarLibros = async (peticion, respuesta) => {
 const obtenerLibros = async (peticion, respuesta) => {
   try {
     const token = peticion.cookies.access_token;
+    console.log("Token recibido librosControlador:", token);
 
     if (!token) {
       return respuesta.status(401).json({ message: "No hay token de autenticación" });
@@ -38,36 +39,65 @@ const obtenerLibros = async (peticion, respuesta) => {
     const data = jwt.verify(token, process.env.CLAVE);
     const usuarioId = data.id;
 
+    console.log("Datos del usuario librosControlador:", data);
+
     if (!usuarioId) {
       return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });
     }
 
     const terminosDeBusqueda = [
-      "bestseller", "popular", "new releases", "award winning", "top rated",
-      "classic literature", "must read", "diverse books", "library picks",
-      "books of the month", "reading list"
+      "bestseller",
+      "popular",
+      "new releases",
+      "award winning",
+      "top rated",
+      "classic literature",
+      "must read",
+      "diverse books",
+      "library picks",
+      "books of the month",
+      "reading list"
     ];
 
     const maxResultadosPorSolicitud = 30;
     const cantidadDeseada = 12;
-    const maxIntentos = 5; // Mantén un número razonable de intentos
+    const maxIntentos = 5;
 
     let librosFiltrados = [];
     const librosUnicos = new Map();
-
     const librosEliminados = librosEliminadosPorUsuario.get(usuarioId) || new Set();
     const generosExcluidos = new Set([
-      "juvenile fiction", "juvenile nonfiction", "education", "children's stories", "animals", "computers", "American periodicals", "Mexico", "Business & Economics", "Political Science", "Religion", "Encyclopedias and dictionaries", "Young Adult Fiction", "Mexican drama", "Mormon Church", "Games & Activities", "Naval art and science", "Foreign Language Study", "Customer services"
+      "juvenile fiction",
+      "juvenile nonfiction",
+      "education",
+      "children's stories",
+      "animals",
+      "computers",
+      "American periodicals",
+      "Mexico",
+      "Business & Economics",
+      "Political Science",
+      "Religion",
+      "Encyclopedias and dictionaries",
+      "Young Adult Fiction",
+      "Mexican drama",
+      "Mormon Church",
+      "Games & Activities",
+      "Naval art and science",
+      "Foreign Language Study",
+      "Customer services"
     ]);
 
-    const buscarLibros = async () => {
+    const buscarLibros = async (idioma) => {
       const promesas = terminosDeBusqueda.map(async (termino) => {
-        for (let intento = 0; intento < maxIntentos; intento++) {
+        let intentos = 0;
+        while (intentos < maxIntentos) {
           const indiceInicio = Math.floor(Math.random() * 500);
+          intentos++;
 
           try {
             const respuestaFetch = await fetch(
-              `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=relevance&langRestrict=en`
+              `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=relevance&langRestrict=${idioma}`
             );
             const data = await respuestaFetch.json();
 
@@ -83,8 +113,7 @@ const obtenerLibros = async (peticion, respuesta) => {
                 !librosEliminados.has(libroId) &&
                 categorias.length > 0 &&
                 categorias[0] !== "Unknown" &&
-                volumenInfo.averageRating &&
-                volumenInfo.language === 'en'
+                volumenInfo.language === idioma
               );
             });
 
@@ -94,10 +123,10 @@ const obtenerLibros = async (peticion, respuesta) => {
               }
             });
 
-            if (librosUnicos.size >= cantidadDeseada) break;
+            if (librosUnicos.size >= cantidadDeseada) return;
 
           } catch (error) {
-            console.error(`Error al obtener libros de Google Books para término ${termino}:`, error);
+            console.error(`Error al obtener libros de Google Books para idioma ${idioma}:`, error);
           }
         }
       });
@@ -105,7 +134,7 @@ const obtenerLibros = async (peticion, respuesta) => {
       await Promise.all(promesas);
     };
 
-    await buscarLibros();
+    await buscarLibros('es'); // Buscar solo en español
 
     librosFiltrados = Array.from(librosUnicos.values()).slice(0, cantidadDeseada);
 
