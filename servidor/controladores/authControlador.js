@@ -4,6 +4,7 @@ const Usuario = require("../modelos/Usuario");
 
 exports.crearCuenta = async (peticion, respuesta) => {
   try {
+    console.log("Cookies recibidas al crear cuenta:", peticion.cookies);
     const { nombre, email, password, avatar } = peticion.body;
 
     if (!nombre || !email || !password || avatar === undefined) {
@@ -59,6 +60,10 @@ exports.crearCuenta = async (peticion, respuesta) => {
       })
       .status(201)
       .json({ message: "Cuenta creada exitosamente", usuario: nuevoUsuario, token });
+      console.log("Cookies establecidas tras crear cuenta:", {
+        access_token: token,
+        refresh_token: refreshToken
+      });
   } catch (error) {
     console.error("Error en la creación de cuenta:", error);
     respuesta.status(500).json({ message: "Error en el servidor", error: error.message });
@@ -68,6 +73,7 @@ exports.crearCuenta = async (peticion, respuesta) => {
 
 exports.iniciarSesion = async (peticion, respuesta) => {
   try {
+    console.log("Cookies recibidas al iniciar sesión:", peticion.cookies);
     const { email, password } = peticion.body;
 
     if (!email || !password) {
@@ -110,6 +116,10 @@ exports.iniciarSesion = async (peticion, respuesta) => {
       })
       .status(200)
       .json({ message: "Inicio de sesión exitoso", usuario, token });
+      console.log("Cookies establecidas tras iniciar sesión:", {
+        access_token: token,
+        refresh_token: refreshToken
+      });
   } catch (error) {
     console.error("Error en el inicio de sesión:", error);
     respuesta.status(500).json({ message: "Error en el servidor", error: error.message });
@@ -118,17 +128,21 @@ exports.iniciarSesion = async (peticion, respuesta) => {
 
 exports.refrescarToken = async (peticion, respuesta) => {
   const { refresh_token } = peticion.cookies;
+  console.log("Cookies recibidas al refrescar token:", peticion.cookies);
 
   if (!refresh_token) {
+    console.log("No se proporcionó refresh token.");
     return respuesta.status(401).json({ message: "No se proporcionó refresh token." });
   }
 
   try {
     const data = jwt.verify(refresh_token, process.env.CLAVE_REFRESH);
+    console.log("Datos decodificados del refresh token:", data);
 
     const usuario = await Usuario.findById(data.id);
 
     if (!usuario || usuario.refreshToken !== refresh_token) {
+      console.log("Refresh token inválido.");
       return respuesta.status(403).json({ message: "Refresh token inválido." });
     }
 
@@ -143,8 +157,10 @@ exports.refrescarToken = async (peticion, respuesta) => {
       expiresIn: "15m"
     });
 
+    console.log("Nuevo access token generado:", nuevoAccessToken);
     respuesta.json({ accessToken: nuevoAccessToken });
   } catch (error) {
+    console.error("Error al refrescar token:", error);
     respuesta.status(403).json({ message: "Token de refresco inválido o expirado." });
   }
 };
