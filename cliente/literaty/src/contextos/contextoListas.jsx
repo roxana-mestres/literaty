@@ -21,8 +21,6 @@ export const ListasProvider = ({ children }) => {
   useEffect(() => {
     if (dataUsuario && dataUsuario._id) {
       obtenerListas();
-    } else {
-      console.error("dataUsuario no está disponible o no tiene un _id válido.");
     }
   }, [dataUsuario]);
 

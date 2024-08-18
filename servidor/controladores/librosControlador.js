@@ -111,9 +111,7 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     await Promise.all([
       buscarLibros('en', 'relevance'),
-      buscarLibros('es', 'relevance'),
       buscarLibros('en', 'newest'),
-      buscarLibros('es', 'newest')
     ]);
 
     librosFiltrados = Array.from(librosUnicos.values()).slice(0, cantidadDeseada);
