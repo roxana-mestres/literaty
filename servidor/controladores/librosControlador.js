@@ -27,6 +27,8 @@ const buscarLibros = async (peticion, respuesta) => {
   }
 };
 
+const jwt = require("jsonwebtoken");
+
 const obtenerLibros = async (peticion, respuesta) => {
   try {
     const token = peticion.cookies.access_token;
@@ -66,27 +68,6 @@ const obtenerLibros = async (peticion, respuesta) => {
     let librosFiltrados = [];
     const librosUnicos = new Map();
     const librosEliminados = librosEliminadosPorUsuario.get(usuarioId) || new Set();
-    const generosExcluidos = new Set([
-      "juvenile fiction",
-      "juvenile nonfiction",
-      "education",
-      "children's stories",
-      "animals",
-      "computers",
-      "American periodicals",
-      "Mexico",
-      "Business & Economics",
-      "Political Science",
-      "Religion",
-      "Encyclopedias and dictionaries",
-      "Young Adult Fiction",
-      "Mexican drama",
-      "Mormon Church",
-      "Games & Activities",
-      "Naval art and science",
-      "Foreign Language Study",
-      "Customer services"
-    ]);
 
     const buscarLibros = async (idioma) => {
       const promesas = terminosDeBusqueda.map(async (termino) => {
@@ -105,11 +86,7 @@ const obtenerLibros = async (peticion, respuesta) => {
               const volumenInfo = libro.volumeInfo || {};
               const categorias = volumenInfo.categories || [];
               const libroId = libro.id || "";
-              const categoriasValidas = categorias.every(
-                (categoria) => !generosExcluidos.has(categoria.toLowerCase())
-              );
               return (
-                categoriasValidas &&
                 !librosEliminados.has(libroId) &&
                 categorias.length > 0 &&
                 categorias[0] !== "Unknown" &&
@@ -134,7 +111,10 @@ const obtenerLibros = async (peticion, respuesta) => {
       await Promise.all(promesas);
     };
 
-    await buscarLibros('es'); // Buscar solo en español
+    await Promise.all([
+      buscarLibros('en'),
+      buscarLibros('es')
+    ]);
 
     librosFiltrados = Array.from(librosUnicos.values()).slice(0, cantidadDeseada);
 
@@ -149,6 +129,7 @@ const obtenerLibros = async (peticion, respuesta) => {
     respuesta.status(500).json({ mensaje: "Error al obtener libros libroControlador", error });
   }
 };
+
 
 const librosEliminadosPorUsuario = new Map();
 
