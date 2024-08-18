@@ -30,7 +30,6 @@ const buscarLibros = async (peticion, respuesta) => {
 const obtenerLibros = async (peticion, respuesta) => {
   try {
     const token = peticion.cookies.access_token;
-    console.log("Token recibido librosControlador:", token);
 
     if (!token) {
       return respuesta.status(401).json({ message: "No hay token de autenticación" });
@@ -39,28 +38,24 @@ const obtenerLibros = async (peticion, respuesta) => {
     const data = jwt.verify(token, process.env.CLAVE);
     const usuarioId = data.id;
 
-    console.log("Datos del usuario librosControlador:", data);
-
     if (!usuarioId) {
       return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });
     }
 
     const terminosDeBusqueda = [
       "bestseller",
-      "award winning",
-      "classic literature",
-      "fiction",
-      "non-fiction",
-      "popular science",
-      "biography",
-      "mystery",
-      "romance",
-      "fantasy",
-      "science fiction",
-      "historical fiction"
+      "top books",
+      "best books",
+      "most popular books",
+      "award winning books",
+      "top rated books",
+      "editor's picks",
+      "must read books",
+      "all time favorites",
+      "critically acclaimed books"
     ];
 
-    const maxResultadosPorSolicitud = 30;
+    const maxResultadosPorSolicitud = 40;
     const cantidadDeseada = 12;
     const maxIntentos = 5;
 
@@ -83,12 +78,11 @@ const obtenerLibros = async (peticion, respuesta) => {
             const nuevosLibros = (data.items || []).filter((libro) => {
               const volumenInfo = libro.volumeInfo || {};
               const categorias = volumenInfo.categories || [];
-              const libroId = libro.id || "";
               const calificacionPromedio = volumenInfo.averageRating || 0;
               return (
                 categorias.length > 0 &&
                 categorias[0] !== "Unknown" &&
-                calificacionPromedio > 0
+                calificacionPromedio >= 3
               );
             });
 
@@ -111,7 +105,7 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     await Promise.all([
       buscarLibros('en', 'relevance'),
-      buscarLibros('en', 'newest'),
+      buscarLibros('es', 'relevance')
     ]);
 
     librosFiltrados = Array.from(librosUnicos.values()).slice(0, cantidadDeseada);
@@ -121,7 +115,6 @@ const obtenerLibros = async (peticion, respuesta) => {
   } catch (error) {
     console.error("Error al obtener libros librosControlador:", error);
     if (error.name === "JsonWebTokenError") {
-      console.error("Error de JWT:", error.message);
       return respuesta.status(401).json({ mensaje: "Token inválido o expirado" });
     }
     respuesta.status(500).json({ mensaje: "Error al obtener libros libroControlador", error });
