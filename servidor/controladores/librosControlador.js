@@ -30,6 +30,7 @@ const buscarLibros = async (peticion, respuesta) => {
 const obtenerLibros = async (peticion, respuesta) => {
   try {
     const token = peticion.cookies.access_token;
+    console.log("Token recibido librosControlador:", token);
 
     if (!token) {
       return respuesta.status(401).json({ message: "No hay token de autenticación" });
@@ -38,22 +39,25 @@ const obtenerLibros = async (peticion, respuesta) => {
     const data = jwt.verify(token, process.env.CLAVE);
     const usuarioId = data.id;
 
+    console.log("Datos del usuario librosControlador:", data);
+
     if (!usuarioId) {
       return respuesta.status(404).json({ mensaje: "Usuario no encontrado" });
     }
 
     const terminosDeBusqueda = [
       "bestseller",
-      "popular",
-      "new releases",
       "award winning",
-      "top rated",
       "classic literature",
-      "must read",
-      "diverse books",
-      "library picks",
-      "books of the month",
-      "reading list"
+      "fiction",
+      "non-fiction",
+      "popular science",
+      "biography",
+      "mystery",
+      "romance",
+      "fantasy",
+      "science fiction",
+      "historical fiction"
     ];
 
     const maxResultadosPorSolicitud = 30;
@@ -76,7 +80,17 @@ const obtenerLibros = async (peticion, respuesta) => {
             );
             const data = await respuestaFetch.json();
 
-            const nuevosLibros = data.items || [];
+            const nuevosLibros = (data.items || []).filter((libro) => {
+              const volumenInfo = libro.volumeInfo || {};
+              const categorias = volumenInfo.categories || [];
+              const libroId = libro.id || "";
+              const calificacionPromedio = volumenInfo.averageRating || 0;
+              return (
+                categorias.length > 0 &&
+                categorias[0] !== "Unknown" &&
+                calificacionPromedio > 0
+              );
+            });
 
             nuevosLibros.forEach((libro) => {
               if (!librosUnicos.has(libro.id)) {
