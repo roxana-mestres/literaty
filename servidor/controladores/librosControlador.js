@@ -27,8 +27,6 @@ const buscarLibros = async (peticion, respuesta) => {
   }
 };
 
-const jwt = require("jsonwebtoken");
-
 const obtenerLibros = async (peticion, respuesta) => {
   try {
     const token = peticion.cookies.access_token;
