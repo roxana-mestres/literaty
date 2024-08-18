@@ -50,24 +50,24 @@ const obtenerLibros = async (peticion, respuesta) => {
 
     const maxResultadosPorSolicitud = 30;
     const cantidadDeseada = 12;
-    const maxIntentos = 5;
+    const maxIntentos = 5; // Mantén un número razonable de intentos
 
     let librosFiltrados = [];
     const librosUnicos = new Map();
 
     const librosEliminados = librosEliminadosPorUsuario.get(usuarioId) || new Set();
     const generosExcluidos = new Set([
-      "juvenile fiction", "juvenile nonfiction", "education", "children's stories", "animals", "computers", "American periodicals", "Mexico", "Business & Economics", "Political Science", "Religion", "Encyclopedias and dictionaries"
+      "juvenile fiction", "juvenile nonfiction", "education", "children's stories", "animals", "computers", "American periodicals", "Mexico", "Business & Economics", "Political Science", "Religion", "Encyclopedias and dictionaries", "Young Adult Fiction", "Mexican drama", "Mormon Church", "Games & Activities", "Naval art and science", "Foreign Language Study", "Customer services"
     ]);
 
-    const buscarLibros = async (idioma) => {
+    const buscarLibros = async () => {
       const promesas = terminosDeBusqueda.map(async (termino) => {
         for (let intento = 0; intento < maxIntentos; intento++) {
           const indiceInicio = Math.floor(Math.random() * 500);
 
           try {
             const respuestaFetch = await fetch(
-              `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=relevance&langRestrict=${idioma}`
+              `https://www.googleapis.com/books/v1/volumes?q=${termino}&startIndex=${indiceInicio}&maxResults=${maxResultadosPorSolicitud}&orderBy=relevance&langRestrict=en`
             );
             const data = await respuestaFetch.json();
 
@@ -78,14 +78,13 @@ const obtenerLibros = async (peticion, respuesta) => {
               const categoriasValidas = categorias.every(
                 (categoria) => !generosExcluidos.has(categoria.toLowerCase())
               );
-              const idiomaLibro = volumenInfo.language || "";
               return (
                 categoriasValidas &&
                 !librosEliminados.has(libroId) &&
                 categorias.length > 0 &&
                 categorias[0] !== "Unknown" &&
                 volumenInfo.averageRating &&
-                idiomaLibro === idioma
+                volumenInfo.language === 'en'
               );
             });
 
@@ -98,7 +97,7 @@ const obtenerLibros = async (peticion, respuesta) => {
             if (librosUnicos.size >= cantidadDeseada) break;
 
           } catch (error) {
-            console.error(`Error al obtener libros de Google Books para idioma ${idioma}:`, error);
+            console.error(`Error al obtener libros de Google Books para término ${termino}:`, error);
           }
         }
       });
@@ -106,10 +105,7 @@ const obtenerLibros = async (peticion, respuesta) => {
       await Promise.all(promesas);
     };
 
-    await Promise.all([
-      buscarLibros('en'),
-      buscarLibros('es')
-    ]);
+    await buscarLibros();
 
     librosFiltrados = Array.from(librosUnicos.values()).slice(0, cantidadDeseada);
 
@@ -124,7 +120,6 @@ const obtenerLibros = async (peticion, respuesta) => {
     respuesta.status(500).json({ mensaje: "Error al obtener libros libroControlador", error });
   }
 };
-
 
 const librosEliminadosPorUsuario = new Map();
 
