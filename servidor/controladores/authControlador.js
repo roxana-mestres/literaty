@@ -48,14 +48,14 @@ exports.crearCuenta = async (peticion, respuesta) => {
     respuesta
       .cookie("access_token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
         expiresIn: "15m"
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       })
       .status(201)
@@ -104,14 +104,14 @@ exports.iniciarSesion = async (peticion, respuesta) => {
     respuesta
       .cookie("access_token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
         expiresIn: "15m"
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       })
       .status(200)
@@ -152,15 +152,14 @@ exports.refrescarToken = async (peticion, respuesta) => {
 
     respuesta.cookie("access_token", nuevoAccessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       expiresIn: "15m"
     });
 
     console.log("Nuevo access token generado:", nuevoAccessToken);
     respuesta.json({ accessToken: nuevoAccessToken });
   } catch (error) {
-    console.error("Error al refrescar token:", error);
     respuesta.status(403).json({ message: "Token de refresco inválido o expirado." });
   }
 };
