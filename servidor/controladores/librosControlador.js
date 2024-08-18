@@ -2,17 +2,23 @@ const jwt = require("jsonwebtoken");
 
 const buscarLibros = async (peticion, respuesta) => {
   const termino = peticion.query.termino;
+  const idioma = peticion.query.idioma || 'en';
+
   if (!termino) {
     return respuesta
       .status(400)
       .json({ message: "Se requiere un término de búsqueda" });
   }
 
+  if (!['en', 'es'].includes(idioma)) {
+    return respuesta
+      .status(400)
+      .json({ message: "Idioma no soportado. Use 'en' para inglés o 'es' para español." });
+  }
+
   try {
     const respuestaFetch = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
-        termino
-      )}`
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(termino)}&langRestrict=${idioma}`
     );
     const data = await respuestaFetch.json();
     respuesta.json(data.items || []);
